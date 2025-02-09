@@ -1,0 +1,32 @@
+
+table {
+    color:black;
+    margin:auto;
+    background-color:lightgrey
+}
+
+thead {
+    background-color: #aaaaaa;
+}
+
+tbody {
+    background-color: white;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+#counter {
+    vertical-align:middle;
+    font-size:24px;
+}
+
+#title {
+    font-size:18px;
+}
+
+#download {
+    vertical-align:middle;
+}
+

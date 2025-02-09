@@ -1,0 +1,17 @@
+.tabelle {
+
+}
+
+.tabelle tr:nth-child(even) {
+  background-color: white;
+}
+
+.tabelle td {
+  vertical-align: top;
+}
+
+.tabelle th {
+  background-color: lightgrey;
+}
+
+

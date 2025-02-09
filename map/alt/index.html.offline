@@ -1,0 +1,302 @@
+<!doctype html>
+
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta http-equiv="cache-control" content="no-cache" />
+
+  <title>Sorbus Domestica</title>
+  <meta name="description" content="Sorbus Domestica Project Showcase">
+  <meta name="author" content="basilstotz">
+
+  <meta property="og:title" content="Sorbus Domestica">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://speierling.arglos.ch">
+  <meta property="og:description" content="Sorbus Domestica Project">
+  <meta property="og:image" content="image.png">
+
+  <!---
+  <link rel="icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  --->
+
+
+  <link rel="stylesheet" href="css/index.css?v=1.0"/>
+  <link rel="stylesheet" href="css/lightbox.min.css"/>
+
+  <link rel="stylesheet" href="css/w3.css"/>
+  <link rel="stylesheet" href="css/leaflet.css"/>
+
+   <script src="js/leaflet.js"></script>
+<!---
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+   integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
+
+   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+--->
+
+   <script src="js/leaflet-colorfilter-min.js"></script>
+   <script src="js/lightbox-plus-jquery.min.js"></script>
+
+
+   <script>
+function httpGet(theUrl, callback)                                                                                                                    
+{                                                                                                                                                     
+    var xmlHttp = new XMLHttpRequest();                                                                                                               
+    xmlHttp.onreadystatechange = function() {                                                                                                         
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)                                                                                         
+            callback(xmlHttp.responseText);                                                                                                           
+    }                                                                                                                                                 
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous                                                                                       
+    xmlHttp.send(null);                                                                                                                               
+}
+
+var sorbusdomestica={}
+var stats={}
+
+httpGet('sorbusdomestica.geojson', (text) => { sorbusdomestica=JSON.parse(text)} );                                                                            
+
+stats.all=sorbusdomestica.features.length;
+stats.project=0;
+stats.pics=0;
+
+for(let i=0;i<stats.all;i++){
+    var item=sorbus.domestica.features[i];
+    if(item.properties.project)stats.project++;
+    if(item.properties.pictures)stats.pics+=item.properties.pictures.length;
+}
+       
+</script>
+
+
+   <!--- <script src="sorbusdomestica.js"></script> --->
+
+
+   <style>
+      a:link {
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+     .full-height {
+	 width: 100%;
+	 height: 100vh;
+     }
+     .tooltip{
+	width: 300px,
+	border-radius: 40px
+     }
+   </style>
+</head>
+
+<body>
+
+
+  <div id="rohdaten" style="font-size:70%;display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px">
+  </div>
+
+
+  <div style="display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px" id="mySidebar">
+    <button style="position:relative;left:250px" onclick="w3_close()"><b>&times</b></button><br/>
+    <b>Vermehrungstyp</b></br>
+
+    <div>
+    <svg width="10" height="10">
+      <circle cx="5" cy="5" r="5" stroke="green" stroke-width="0" fill="green" />
+    </svg>
+       natürlich
+    </div>
+
+    <div>
+    <svg width="10" height="10">
+      <circle cx="5" cy="5" r="5" stroke="green" stroke-width="0" fill="olive" />
+    </svg>
+       evtl. natürlich
+    </div>
+
+    <div>
+    <svg width="10" height="10">
+      <circle cx="5" cy="5" r="5" stroke="green" stroke-width="0" fill="blue" />
+    </svg>
+      gepflanzt (Herkunft unbekannt)
+    </div>
+
+    <div>
+    <svg width="10" height="10">
+      <circle cx="5" cy="5" r="5" stroke="green" stroke-width="0" fill="orange" />
+    </svg>
+       gepflanzt (Reiser autochton)
+    </div>
+
+    <div>
+    <svg width="10" height="10">
+      <circle cx="5" cy="5" r="5" stroke="green" stroke-width="0" fill="red" />
+    </svg>
+       gepflanzt (Samen autochton)
+    </div>
+
+    <div>
+    <svg width="10" height="10">
+      <circle cx="5" cy="5" r="5" stroke="green" stroke-width="0" fill="black" />
+    </svg>
+       nicht erhoben 
+    </div>
+
+
+    </br><b>Umfang auf Brusthöhe</b></br>
+    <div>
+    <svg width="20" height="20">
+      <circle cx="10" cy="10" r="2" stroke="green" stroke-width="0" fill="blue" />
+    </svg>
+       &lt; 0.1 m
+    </div>
+
+    <div>
+    <svg width="20" height="20">
+      <circle cx="10" cy="10" r="3" stroke="green" stroke-width="0" fill="blue" />
+    </svg>
+      0.3 m
+    </div>
+
+    <div>
+    <svg width="20" height="20">
+      <circle cx="10" cy="10" r="5" stroke="green" stroke-width="0" fill="blue" />
+    </svg>
+       1.0 m
+    </div>
+
+    <div>
+    <svg width="20" height="20">
+      <circle cx="10" cy="10" r="7" stroke="green" stroke-width="0" fill="blue" />
+    </svg>
+       1.5 m
+    </div>
+
+    <div>
+    <svg width="20" height="20">
+      <circle cx="10" cy="10" r="10" stroke="green" stroke-width="0" fill="blue" />
+    </svg>
+       &gt; 2 m 
+    </div>
+
+    <div>
+    <svg width="20" height="20">
+      <circle cx="10" cy="10" r="5" stroke="green" stroke-width="0" fill="royalblue" />
+    </svg>
+       nicht erhoben 
+    </div>
+
+    <p><b>Klick auf Marker zeigt Details!</b></p>
+
+    <p>Rohdaten als <a href="sorbusdomestica.geojson"><b>Geojson-Datei</b></a> herunterladen</p>
+</div>
+
+
+<div id="button" style="transition:1s;transition-delay:1s;opacity:1.0;z-index:4;position:fixed;top:10px;right:10px">
+    <!---<button  onclick="w3_open()">&#9776;</button>--->
+    <button onclick="w3_open()"><b>?</b></button>
+</div>
+ 
+  <div style="z-index:1" class="full-height"  id="map"></div>
+
+
+  <script src="index.js"></script>
+
+  <script>
+  
+    function w3_open(){
+	let d=document.getElementById("mySidebar").style; d.right="0px";
+	let b=document.getElementById("button").style; b.display="none";
+    }
+    function w3_close(){
+	let d=document.getElementById("mySidebar").style; d.right="-300px";
+	let b=document.getElementById("button").style; b.display="block";
+    }
+    w3_close();
+
+    let roh;
+
+    function rohSet(id){
+	let d=document.getElementById("rohdaten");
+        let feature=geojsonObject[id];
+
+
+   /////// project //////////                                                                                                                        
+    //let location="";                                                                                                                                  
+    let project="";
+    if (feature.properties.project) {                                                                                                                 
+        project='<p>';                                                                                                                                
+        //location='<h5 style="margin-bottom:0px">'+feature.properties.project.Ort+', '+feature.properties.project.Gebiet+'</h6>';                              let first=true;                                                                                                                               
+        for (const [key, value] of Object.entries(feature.properties.project)) {                                                                      
+            //console.log(`${key}: ${value}`);                                                                                                                        if(key=='Vermehrungstyp'){Vermehrungstyp=value}                                                                                       
+                //if(key=='Pflanzjahr'){Pflanzjahr=value}                                                                                               
+                //if(key=='Herkunft'){Herkunft=value}                                                                                                                   if(key=='Fruechte'){Fruechte=value}                                                                                                   
+                if(first){                                                                                                                            
+                    project+="<b>"+key+":</b> "+value;                                                                                                                    first=false;                                                                                                                      
+                }else{                                                                                                                                
+                    project+="<br><b>"+key+":</b> "+value;                                                                                            
+                }                                                                                                                                     
+        }                                                                                                                                             
+        project+='</p>';                                                                                                                              
+    }                                                                                                                                                 
+
+
+   /////// tags /////////////////////////                                                                                                                let tags="";                                                                                                                                      
+    if (feature.properties.tags) {                                                                                                                    
+        tags+='<p>';                                                                                                                                          let first=true;                                                                                                                               
+        for (const [key, value] of Object.entries(feature.properties.tags)) {                                                                         
+            //console.log(`${key}: ${value}`);                                                                                                                    if( ! ( key == 'leaf_cycle' ||  key == 'leaf_type' || key == 'species' || key == 'species:de' || key == 'natural')){                      
+                //if(key=='circumference'){                                                                                                             
+                //   if(value>5.0){                                                                                                                                             circumference=Math.round(value)/100.0;                                                                                        
+                //   }else{                                                                                                                             
+                //        circumference=value;                                                                                                                             }                                                                                                                                  
+                //}                                                                                                                                     
+                //if(key=='height'){height=value}                                                                                                       
+                if(first){                                                                                                                            
+                    tags+="<b>"+key+":</b> "+value;                                                                                                   
+                    first=false;                                                                                                                      
+                }else{                                                                                                                                
+                    tags+="<br><b>"+key+":</b> "+value;                                                                                               
+                }                                                                                                                                     
+                                                                                                                                                      
+            //}                                                                                                                                         
+        }                                                                                                                                             
+        tags+='</p>';                                                                                                                                 
+    }                                                                                                                                                 
+
+
+        d.innerHTML=tags+project;
+        roh=false; 
+        d.style.right="-300px";
+    }
+
+    function rohToggle(id){
+	let d=document.getElementById("rohdaten"); 
+	if(roh==false){
+	   //d.style.right="0px";
+           //roh=true;
+	   rohSet(id);
+	}else{
+	   d.style.right="-300px";
+	   roh=false;
+	}
+    }
+
+    function rohClose(){
+	let d=document.getElementById("rohdaten"); 
+	d.style.right="-300px";
+	roh=false;
+    }
+
+
+  </script>
+  <!--- <climate-clock /> --->
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabelle Projekt Speierling</title>
+  <!---
+  <link rel="stylesheet" href="styles.css">
+  --->
+
+
+  <script>
+    function getDestSuffix(){
+        let pathName=window.location.pathname;
+        let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
+        if(fileName=='')fileName='index.html';
+
+        let destSuffix='.html';
+        if(fileName.split('_')[1])destSuffix='_'+fileName.split('_')[1];
+        return destSuffix
+    }
+
+    var destSuffix=getDestSuffix();
+    var devMode=(destSuffix!='.html');
+
+    function toHome(){
+	document.getElementById("home").href = window.location.href.replace('/tabelle','');
+   }
+  </script>
+
+  <script src="tabelle.js"></script>
+  <link rel="stylesheet" href="tabelle.css">
+  
+  <script>
+
+     function propagation(elm,inhalt){
+	 let color;
+	 switch(inhalt){
+	 case 'natural':
+	     color='mediumseagreen';
+	     break;
+	 case 'sucker':
+	     color='yellow';
+	     break;
+	 case 'planted':
+	     color='dodgerblue';
+	     break;
+	 case 'seed':
+	     color='tomato'
+	     break;
+	 case 'graft':
+	     color='orange'
+	     break;
+	 default:
+	     //color='lightgrey'
+	     break;
+	 }
+	 if(color)elm.setAttribute('style','background-color:'+color);
+     }
+
+    
+     function onBody(){
+
+	 toHome();
+
+	 let columns = [
+	     {title:"Land", field:"addr:country", sorter:"string",headerFilter:true },
+	     {title:"Kanton", field:"addr:state", sorter:"string",headerFilter:true },
+	     {title:"Gemeinde", field:"addr:gemeinde", sorter:"string", headerFilter:true  },
+	     {title:"Gebiet", field:"speierlingproject:gebiet", sorter:"string", headerFilter:true },
+	     {title:"Vermehrungstyp", field:"propagation", styleFunc: propagation, sorter:"string", headerFilter:true },
+	     {title:"Datum", field:"start_date", sorter:"numeric",headerFilter:false   },
+	     {title:"Umfang", field:"circumference", sorter:"numeric",headerFilter:false  },
+	     {title:"Höhe", field:"height", sorter:"numeric", headerFilter:false  },
+
+	     {title: "Lat", field: "lat", hidden: true  },
+	     {title: "Lon", field: "lon", hidden: true  },
+	     {title: "Id", field: "id", hidden: true  }
+	 ];
+
+	 let options= {
+	     status: {
+		 counter: "Speierlinge",
+		 title: false,
+	         download: "Aktuelle Ansicht als CSV-Datei herunterladen"
+	     },
+	     noNames: false,
+	     noTable: false,
+	 }
+
+	 let records=[];
+	 fetch('../data/sorbusdomestica.geojson')
+	 .then((resp) => resp.json())
+	     .then(function(data) {
+		 let features=data.features;
+
+		 for(const feature of features){
+		     let tags=feature.properties.tags
+		     let coordinates=feature.geometry.coordinates;
+		     let link='https://openstreetmap.org/'+feature.id;
+		     if(!tags['addr:state'])tags['addr:state']=tags['addr:gemeinde'];
+		     tags['id']=feature.id;
+		     tags['lat']=coordinates[1];
+		     tags['lon']=coordinates[0];
+		     records.push(tags);
+		 }
+		 new Tabelle('tabelle', records, columns, options);     
+	 })
+	 .catch(function(error) {
+	   console.log(error);
+	 });
+     }    
+  </script>
+
+  
+  <style>
+    body {
+	font-family:arial;
+	color:white;
+	background-color: rgba(255,255,255,0);
+	
+    }
+    h1 {
+	text-align:center
+    }
+    #tabelle {
+	background-color: rgba(255,255,255,0);
+	margin:auto;
+    }
+    #home {
+	z-index:5;
+	opacity:0.7;
+	position:absolute;
+	top:20px;
+	left:20px;
+    }
+   .bgimg {
+       background-image: url('images/background.jpg');
+   /*  min-height: 100%;
+     background-position: center;
+     background-size: cover;*/
+   }
+  </style>
+</head>
+
+<body class="bgimg" onload="onBody()">
+  <a id="home"><img style="width:30px" src="images/home.png"></a>
+  <h1>Projekt Speierling Tabelle</h1>
+  <!--<span style="color:lightgrey;font-size:14px" id="disp"></span>--> 
+  <div id="tabelle"></div>
+</body>
+
+
+</html
+
+  
+

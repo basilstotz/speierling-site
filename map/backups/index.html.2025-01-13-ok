@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Speierling</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="referrer" content="no-referrer">
+
+<!---
+<meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+--->
+
+
+<meta property="og:title" content="Speierling Projekt">
+<meta property="og:site_name" content="speierling.arglos.ch">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://speierling.arglos.ch">
+<meta property="og:image" content="https://speierling.arglos.ch/gis/site/speierling.jpg">
+<meta property="og:description" content="Für den Schutz und die genetische Vielfalt des Speierlings">
+
+
+<!---
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+--->
+<link rel="stylesheet" href="css/w3.css">
+<link rel="stylesheet" href="css/raleway.css">
+
+<style>
+.loader {
+  width: 60px;
+  height: 60px;
+  display: block;
+  margin: 20px auto;
+  position: relative;
+  background: radial-gradient(ellipse at center, #FFF 69%, rgba(0, 0, 0, 0) 70%), linear-gradient(to right, rgba(0, 0, 0, 0) 47%, #FFF 48%, #FFF 52%, rgba(0, 0, 0, 0) 53%);
+  background-size: 20px 20px , 20px auto;
+  background-repeat: repeat-x;
+  background-position: center bottom, center -5px;
+  box-sizing: border-box;
+}
+.loader::before,
+.loader::after {
+  content: '';  
+  box-sizing: border-box;
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 20px;
+  height: 60px;
+  background: radial-gradient(ellipse at center, #FFF 69%, rgba(0, 0, 0, 0) 70%), linear-gradient(to right, rgba(0, 0, 0, 0) 47%, #FFF 48%, #FFF 52%, rgba(0, 0, 0, 0) 53%);
+  background-size: 20px 20px , 20px auto;
+  background-repeat: no-repeat;
+  background-position: center bottom, center -5px;
+  transform: rotate(0deg);
+  transform-origin: 50% 0%;
+  animation: animPend 1s linear infinite alternate;
+}
+.loader::after {
+  animation: animPend2 1s linear infinite alternate;
+  left: 100%;
+}
+
+@keyframes animPend {
+  0% {
+    transform: rotate(22deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes animPend2 {
+  0%, 55% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-22deg);
+  }
+}
+</style>
+
+<style>
+body,h1 {font-family: "Raleway", sans-serif}
+body, html {height: 100%}
+.bgimg {
+  background-image: url('images/background.jpg');
+  min-height: 100%;
+  background-position: center;
+  background-size: cover;
+}
+button {
+  background-color: #666666;
+  opacity: 0.8; 
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius:12px;
+}
+</style>
+
+<!---
+<script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
+---->
+
+<script src="js/tsparticles.confetti.bundle.min.js"></script>
+
+
+<script>
+function httpGet(theUrl, callback)                                                                                                                    
+{                                                                                                                                                     
+    var xmlHttp = new XMLHttpRequest();                                                                                                               
+    xmlHttp.onreadystatechange = function() {                                                                                                         
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)                                                                                         
+            callback(xmlHttp.responseText);                                                                                                           
+    }                                                                                                                                                 
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous                                                                                       
+    xmlHttp.send(null);                                                                                                                               
+}
+</script>
+
+
+
+<script>
+	function myfunc(){
+		document.getElementById("link").href = "karte.html";
+	}
+</script>
+
+</head>
+
+<body>
+
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+
+
+  <div class="w3-display-middle w3-center">
+    <p class="w3-xlarge w3-center">Für den Schutz und die genetische Vielfalt des Speierlings (Cormus Domestica), damit die Art
+langfristig erhalten bleibt</p>
+
+    <h1 class="w3-jumbo w3-animate-top"><b>Projekt Speierling</b></h1>
+
+    <!---<span class="loader"></span>--->
+
+    <p class="w3-xlarge w3-center" id="statsA" style="margin-bottom:14px"><br/></p>
+    <p class="w3-xlarge w3-center" id="statsB" style="margin-top:14px;margin-bottom:32px"><br/><br/></p>
+
+    <a id="link" class="w3-center w3-animate-top"><button><b>Zur Karte gehen</b></button></a>
+  </div>
+
+
+
+  <div class="w3-display-topleft w3-padding-large">
+    <a href="https://speierling.arglos.ch/daten.php">Datenablage</a>
+  </div>
+
+  <div class="w3-display-topmiddle w3-padding-large">
+    <a id="link2" href="form.php" class="w3-center w3-animate-top"><button style="font-size:14px;padding:8px 8px;"><b>Einen Speierling melden</b></button></a>
+  </div>
+
+  <div class="w3-display-topright w3-padding-large">
+     <a href="https://de.wikipedia.org/wiki/Speierling">Speierling auf Wikipedia</a>
+  </div>
+
+
+  <div class="w3-display-bottomleft w3-padding-large">
+     Projektleitung: Martin Dick &amp; Christian Erdin
+  </div>
+
+<!---
+.button {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+--->
+
+
+  <div class="w3-display-bottommiddle w3-padding-large w3-xlarge">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="images/CC-BY-SA_icon.png" alt="" width="100px" style="opacity:0.5"></a>
+  </div>
+
+  <div class="w3-display-bottomright w3-padding-large">
+     <a href="https://www.anhbl.ch">Arbeitsgemeinschaft für Natur- und Heimatschutz Baselland</a>
+  </div>
+
+
+</div>
+
+<script>
+	myfunc();
+</script>
+
+<script>
+var sorbusdomestica={}
+var stats={}
+
+httpGet('sorbusdomestica.geojson', (text) => { 
+      sorbusdomestica=JSON.parse(text);
+      stats.all=sorbusdomestica.features.length;
+      stats.project=0;
+      stats.pics=0;
+      stats.plantation=0;
+      stats.natural=0;
+
+      for(let i=0;i<stats.all;i++){
+         var item=sorbusdomestica.features[i];
+         if(item.properties.project){
+	     stats.project++;
+             if(item.properties.project.Vermehrungstyp){
+                 switch(item.properties.project.Vermehrungstyp){
+                    case "N": stats.natural++;
+                              break;
+                    case "U": stats.natural++;
+                              break;
+                    case "TR": stats.plantation++
+		               break;
+                    case "TS": stats.plantation++
+		               break;
+                    default: break;
+
+                 }
+             }
+          }
+         if(item.properties.pictures)stats.pics+=item.properties.pictures.length;
+      }
+
+
+//stars
+const defaults = {
+  spread: 360,
+  ticks: 50,
+  gravity: 0,
+  decay: 0.94,
+  startVelocity: 30,
+  shapes: ["star"],
+  colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+};
+
+function shoot() {
+  confetti({
+    ...defaults,
+    particleCount: 40,
+    scalar: 1.2,
+    shapes: ["star"],
+  });
+
+  confetti({
+    ...defaults,
+    particleCount: 10,
+    scalar: 0.75,
+    shapes: ["circle"],
+  });
+}
+
+let num;
+
+if(stats.project>=1000){
+  setTimeout(shoot, 0);
+  setTimeout(shoot, 200);  
+  setTimeout(shoot, 800);
+  setTimeout(shoot, 1000);
+  num='<span style="color:white">'+stats.project+'</span>';
+}else{
+  num='<span style="color:yellow">'+stats.project+'</span>';
+}
+
+//stars
+
+      let textA = "Die Bestandesaufnahme der lokalen Populationen umfasst "+num+" Speierlingsportraits mit "+stats.pics+" Bildern.";
+
+      let textB = "Es wurden  "+stats.natural+" Speierlinge natürlichen Ursprungs gefunden.</p><p> Von diesen wurden " ;
+      textB += ""+stats.plantation+" Nachkommen (Reiser und Samen) gepflanzt. Alle neu gepflanzten Speierlinge werden beobachtet und gepflegt."
+
+
+      document.getElementById("statsA").innerHTML = textA;
+      document.getElementById("statsB").innerHTML = textB;
+
+} );                                                                   
+         
+
+       
+</script>
+
+
+</body>
+</html>
+

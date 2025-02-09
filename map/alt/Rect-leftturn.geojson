@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "name": "Sorbus_domestica_rect",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": 0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -10.0,
+              55.0
+            ],
+            [
+              40.0,
+              55.0
+            ],
+            [
+              40.0,
+              30.0
+            ],
+            [
+              -10.0,
+              30.0
+            ],
+            [
+              -10.0,
+              55.0
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

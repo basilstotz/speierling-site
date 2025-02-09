@@ -1,0 +1,70 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Statistics</title>
+  <meta name="description" content="Statistics on Speierling Project.">
+  <meta name="author" content="Stotz">
+  
+  <!--
+  <meta property="og:title" content="Statistics">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.sitepoint.com/a-basic-html5-template/">
+  <meta property="og:description" content="A simple HTML5 Template for new projects.">
+  <meta property="og:image" content="image.png">
+
+  <link rel="icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  --->
+  
+  <link rel="stylesheet" href="css/tabulator.css">
+  <link rel="stylesheet" href="css/raleway.css">
+
+  <link rel="stylesheet" href="index.css">
+
+  <script src="js/plotly.js"></script>
+
+  <script src="popup-functions.js"></script>
+
+  <script>
+    function getDestSuffix(){
+	let pathName=window.location.pathname;
+	let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
+	if(fileName=='')fileName='index.html';
+
+	let destSuffix='.html';
+	if(fileName.split('_')[1])destSuffix='_'+fileName.split('_')[1];
+	return destSuffix
+    }
+
+    var destSuffix=getDestSuffix();
+    var devMode=(destSuffix!='.html');
+
+  </script>
+
+  <script src="../data/archive-stats.js"></script>
+
+
+
+</head>
+
+<body class="bgimg" onload="onBody()">
+  <!-- cc0 -> https://www.svgrepo.com/svg/22031/home-icon-silhouette -->
+  <a id="homelink"><img src="images/home.png" style="opacity:0.7;width:30px;position:absolute"></a>
+
+  <script>
+    document.getElementById('homelink').href=window.location.href.replace('/statistics','');
+  </script>
+
+  <h2 style="text-align:center">Speierling Projekt Statistik</h2>
+  <div id="inhalt" style="margin:auto;max-width:708px"></div>
+
+
+
+  <script src="statistics.js"></script>
+</body>
+</html>

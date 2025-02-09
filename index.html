@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Speierling</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="referrer" content="no-referrer">
+
+<!---
+<meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+--->
+
+
+<meta property="og:title" content="Speierling Projekt">
+<meta property="og:site_name" content="speierling.arglos.ch">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://speierling.arglos.ch">
+<meta property="og:image" content="https://speierling.arglos.ch/gis/site/speierling.jpg">
+<meta property="og:description" content="Für den Schutz und die genetische Vielfalt des Speierlings">
+
+
+<link rel="stylesheet" href="css/w3.css">
+<link rel="stylesheet" href="css/raleway.css">
+
+
+<link rel="stylesheet" href="index.css" >
+
+<script src="js/tsparticles.confetti.bundle.min.js"></script>
+
+
+<!-- <script src="index.js"></script> -->
+<script>
+function httpGet(theUrl, callback)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
+    xmlHttp.send(null);
+}
+
+    function getDestSuffix(){
+        let pathName=window.location.pathname;
+        let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
+        if(fileName=='')fileName='index.html';
+
+        let destSuffix='.html';
+        if(fileName.split('_')[1])destSuffix='_'+fileName.split('_')[1];
+        return destSuffix
+    }
+
+    var destSuffix=getDestSuffix();
+    var devMode=(destSuffix!='.html');
+
+   function toMap(){
+       document.getElementById("link").href = 'map/index'+destSuffix;;
+   }
+   function toStats(){
+       document.getElementById("linker").href = "statistics/index"+destSuffix;
+   }
+   function toTabular(){
+       document.getElementById("tabular").href = "tabelle/index"+destSuffix;
+   }
+
+</script>
+
+
+
+</head>
+
+<body>
+
+<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+
+
+  <div class="w3-display-middle w3-center">
+    <p class="w3-xlarge w3-center">Für den Schutz und die genetische Vielfalt des Speierlings (Cormus Domestica), damit die Art
+langfristig erhalten bleibt</p>
+
+    <h1 class="w3-jumbo w3-animate-top"><b>Projekt Speierling</b></h1>
+
+    <!---<span class="loader"></span>--->
+
+    <p class="w3-xlarge w3-center" id="statsA" style="margin-bottom:14px"><br/></p>
+    <p class="w3-xlarge w3-center" id="statsB" style="margin-top:14px;margin-bottom:32px"><br/><br/></p>
+
+    <span class="w3-center w3-animate-top">
+      <a id="tabular"><button style="width:120px"><b>Tabelle</b></button></a>
+      <a id="link"><button style="width:120px"><b>Karte</b></button></a>
+      <a id="linker"><button style="width:120px"><b>Statistik</b></button></a>
+    </span>
+  </div>
+
+
+
+  <div class="w3-display-topleft w3-padding-large">
+    <a href="https://speierling.arglos.ch/daten.php">Datenablage</a>
+  </div>
+
+  <div class="w3-display-topmiddle w3-padding-large">
+    <a id="link2" href="form.php" class="w3-center w3-animate-top"><button style="font-size:14px;padding:8px 8px;"><b>Einen Speierling melden</b></button></a>
+  </div>
+
+  <div class="w3-display-topright w3-padding-large">
+    <span>Geoinformatik und Website: Basil Stotz</span>
+<!--     <a href="https://de.wikipedia.org/wiki/Speierling">Speierling auf Wikipedia</a> -->
+  </div>
+
+
+  <div class="w3-display-bottomleft w3-padding-large">
+     Projektleitung: Martin Dick &amp; Christian Erdin
+  </div>
+
+
+
+  <div class="w3-display-bottommiddle w3-padding-large w3-xlarge">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de"><img src="images/CC-BY-SA_icon.png" alt="" width="100px" style="opacity:0.5"></a>
+  </div>
+
+  <div class="w3-display-bottomright w3-padding-large">
+     <a href="https://www.anhbl.ch">Arbeitsgemeinschaft für Natur- und Heimatschutz Baselland</a>
+  </div>
+
+
+</div>
+
+<script>
+  toMap();
+  toStats();
+  toTabular();
+</script>
+
+<script>
+var sorbusdomestica={}
+var stats={}
+
+httpGet('data/sorbusdomestica.geojson', (text) => { 
+      sorbusdomestica=JSON.parse(text);
+      stats.all=sorbusdomestica.features.length;
+      stats.project=0;
+      stats.pics=0;
+      stats.plantation=0;
+      stats.natural=0;
+
+      for(let i=0;i<stats.all;i++){
+         var item=sorbusdomestica.features[i];
+         if(item.properties.tags.speierlingproject){
+	     stats.project++;
+             if(item.properties.tags.propagation){
+                 switch(item.properties.tags.propagation){
+                    case "natural": stats.natural++;
+                              break;
+                    case "sucker": stats.natural++;
+                              break;
+                    case "planted": 
+		               break;
+                    case "graft": //stats.plantation++
+		               break;
+                    case "seed": //stats.plantation++
+		               break;
+                    default: break;
+
+                 }
+             }
+         }
+	  
+          if(item.properties.tags['speierlingproject:neupflanzung'])stats.plantation++;
+	  
+          if(item.properties.pictures){
+	      stats.pics+=item.properties.pictures.length
+	  }else if(item.properties.tags["meta:media_size"]){
+	      stats.pics+=item.properties.tags["meta:media_size"]
+	  }
+      }
+
+
+//stars
+const defaults = {
+  spread: 360,
+  ticks: 50,
+  gravity: 0,
+  decay: 0.94,
+  startVelocity: 30,
+  shapes: ["star"],
+  colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+};
+
+function shoot() {
+  confetti({
+    ...defaults,
+    particleCount: 40,
+    scalar: 1.2,
+    shapes: ["star"],
+  });
+
+  confetti({
+    ...defaults,
+    particleCount: 10,
+    scalar: 0.75,
+    shapes: ["circle"],
+  });
+}
+
+let num;
+
+if(stats.project>=1000){
+  setTimeout(shoot, 0);
+  setTimeout(shoot, 200);  
+  setTimeout(shoot, 800);
+  setTimeout(shoot, 1000);
+  num='<span style="color:white">'+stats.project+'</span>';
+}else{
+  num='<span style="color:yellow">'+stats.project+'</span>';
+}
+
+//stars
+
+      let textA = "Die Bestandesaufnahme der lokalen Populationen umfasst "+num+" Speierlingsportraits mit "+stats.pics+" Bildern.";
+
+      let textB = "Es wurden  "+stats.natural+" Speierlinge natürlichen Ursprungs gefunden.</p><p> Von diesen wurden " ;
+      textB += ""+stats.plantation+" Nachkommen (Reiser und Samen) gepflanzt. Alle neu gepflanzten Speierlinge werden beobachtet und gepflegt."
+
+
+      document.getElementById("statsA").innerHTML = textA;
+      document.getElementById("statsB").innerHTML = textB;
+
+} );                                                                   
+         
+
+       
+</script>
+
+
+</body>
+</html>
+
