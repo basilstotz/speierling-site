@@ -69,14 +69,6 @@ button {
 
     <form action="" method="post">
 
-<!---
-      <label for="fname">First name:</label><br>
-      <input type="text" id="fname" name="fname"><br>
-
-      <label for="lname">Last name:</label><br>
-      <input type="text" id="lname" name="lname"><br>
---->
-
   <label for="lname"></label><br>
   <textarea id="ltext" name="ltext" rows="15" cols="40"></textarea></br>
 
