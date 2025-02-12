@@ -43,7 +43,7 @@ function addParent(geojson){
 
 function getRelationGeojson(geojson){
 
-    let relationGeojson= { type: "featureCollection", features: [] };
+    let relationGeojson= { type: "FeatureCollection", features: [] };
 
     for(let i=0;i<geojson.features.length;i++){
         let feature=geojson.features[i];
@@ -211,13 +211,35 @@ let esriLayer;
         filter: esriFilter
    }) //.addTo(map);
 
+/*
+let shadeFilter = [
+    'blur:0px',
+    'brightness:100%',
+    'contrast:100%',
+    'grayscale:0%',
+    'hue:0deg',
+    'opacity:100%',
+    'invert:0%',
+    'saturate:100%',
+    'sepia:0%'
+];
+
+
+let shadeLayer;
+   shadeLayer  = L.tileLayer.colorFilter('https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}', {
+        attribution: "Sources: Esri, TomTom, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors, and the GIS User Community",
+
+        filter: shadeFilter
+   }).addTo(map);
+*/
+
 let osmFilter = [
     'blur:0px',
     'brightness:100%',
     'contrast:100%',
     'grayscale:100%',
     'hue:0deg',
-    'opacity:100%',
+    'opacity:70%',
     'invert:0%',
     'saturate:100%',
     'sepia:0%'
@@ -237,7 +259,7 @@ if(offline==true){
 	'Imagery © <a href="https://github.com/rinigus/osmscout-server">OSM Scout Server</a>'
     }).addTo(map);
 }else{                          //  https:(({a|b|c}.tile.opentopomap.org/{z}/{x}/{y}.png
-    // https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+    // 
     // http://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png
     osmLayer = L.tileLayer.colorFilter('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
@@ -253,7 +275,6 @@ let contours = L.tileLayer('https://tile.osm.ch/contours/{z}/{x}/{y}.png', {
 
 contours.addTo(map);
 */
-
 
 
 
@@ -437,9 +458,13 @@ function  adaptZoom(){
     if(scale<0.2)scale=0.2;
     scaleMarkerRadius(scale);
 
-
-
-   
+    /*
+    if(zoom>13){
+	if(map.hasLayer(shadeLayer))map.removeLayer(shadeLayer);
+    }else{
+	if(!map.hasLayer(shadeLayer))map.addLayer(shadeLayer);
+    }
+    */
     if(zoom>16){
 	ziel=100;
         if(ziel==100)if(!map.hasLayer(esriLayer))map.addLayer(esriLayer);
