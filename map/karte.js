@@ -403,6 +403,19 @@ function addGeojsonRect(responseText){
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+function httpGet(theUrl, callback){                                
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+	if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+	    //stopSpinner()                                                                                         
+	    callback(xmlHttp.responseText);
+	}                                                                                                           
+    }         
+    xmlHttp.open("GET", theUrl, true); // true for asynchronous
+    xmlHttp.send(null);
+}
+
+
 
 // load and add layers
 //httpGet('cliff+045+005.geojson', addGeojsonCliff);
