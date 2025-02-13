@@ -267,14 +267,31 @@ if(offline==true){
    }).addTo(map);
 }
 
-/*
-let contours = L.tileLayer('https://tile.osm.ch/contours/{z}/{x}/{y}.png', {
+
+// 
+
+
+let slopeFilter = [
+    'blur:0px',
+    'brightness:100%',
+    'contrast:100%',
+    'grayscale:0%',
+    'hue:0deg',
+    'opacity:40%',
+    'invert:0%',
+    'saturate:100%',
+    'sepia:0%'
+];
+
+
+let slopeLayer = L.tileLayer.colorFilter('https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.hangneigung-ueber_30/default/current/3857/{z}/{x}/{y}.png', {
     maxZoom: 20,
-    attribution: '© OpenStreetMap'
+    attribution: '© SwissTopo',
+    filter: slopeFilter
 });
 
-contours.addTo(map);
-*/
+slopeLayer.addTo(map);
+
 
 
 
@@ -451,6 +468,10 @@ function  adaptZoom(){
 	if(fillOpacity<0.0)fillOpacity=0.0;  
 	distri.setStyle(function(feature){return { opacity:0.0,fillOpacity:fillOpacity,color:"#004400" }})
     }
+
+    if(slopeLayer){
+	slopeLayer.updateFilter( [ 'opacity:50%', 'grayscale:'+grayscale+'%' ] );
+    }
    
     //marker size
     let scale= 0.25+(zoom-5.0)/10.0;
@@ -500,5 +521,6 @@ function fader(opacity,grayscale){
     let rest=100-opacity;
     esriLayer.updateFilter( [ 'opacity:'+opacity+'%', 'grayscale:'+grayscale+'%' ] );
     osmLayer.updateFilter( [ 'opacity:'+rest+'%', 'grayscale:'+grayscale+'%' ] );
+    
 }
 
