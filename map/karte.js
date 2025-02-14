@@ -129,13 +129,19 @@ function pointToLayer(feature, latlng) {
 
     let m;
     let pro=false;
+    if(tags['speierlingproject:neupflanzung'])pro=true;
 
+
+    
     if(pro){
        m = L.shapeMarker(latlng, {
-                fillColor: color,
-                color: color,
-                shape: "triangle",
-                radius: radius*0.7
+	   radius: radius,
+	   weight: weight,
+	   color: color,
+	   opacity: 1.0,
+	   fillColor: color,
+           fillOpacity: fillOpacity,
+           shape: "square"
         });         
     }else{
        m = L.circleMarker(latlng,
