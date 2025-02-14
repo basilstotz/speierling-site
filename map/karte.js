@@ -277,7 +277,7 @@ let slopeFilter = [
     'contrast:100%',
     'grayscale:0%',
     'hue:0deg',
-    'opacity:40%',
+    'opacity:100%',
     'invert:0%',
     'saturate:100%',
     'sepia:0%'
