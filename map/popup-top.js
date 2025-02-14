@@ -52,22 +52,7 @@ function portrait(parentElm,feature, diffs){
     if(tags.ele){
 	appendTableRow(tabelle, "Elevation:", tags.ele+' m');
     }
-    
-    if(tags.latest_update){
-	appendTableRow(tabelle, "Daten von:", year(tags.latest_update));
-    }
-    
-    if(tags.circumference) {           
-	appendTableRow(tabelle, "Umfang:", tags.circumference+' m');
-    }
 
-    if(tags.diameter_crown) {           
-	appendTableRow(tabelle, "Krone:", tags.diameter_crown+' m');
-    }
-
-    if(tags.height) {           
-	appendTableRow(tabelle, "Höhe:", tags.height+' m');
-    }
 
     let propagation;
     if(tags.propagation){
@@ -93,6 +78,7 @@ function portrait(parentElm,feature, diffs){
 	}
 	appendTableRow(tabelle, "Vermehrungstyp:", propagation);
     }
+    
     if(feature.properties.parentFeature){
         let parent = feature.properties.parentFeature;
 
@@ -103,6 +89,25 @@ function portrait(parentElm,feature, diffs){
 	let herkunft = '<span style="color:rgb(0,120,168)" onclick="map.setView(L.latLng('+pCoords[1]+','+pCoords[0]+'))">'+pOrt+'/'+pGebiet+'</span>';
 	appendTableRow(tabelle, "Herkunft:", herkunft)
     }
+
+
+    
+    if(tags.latest_update){
+	appendTableRow(tabelle, "Daten von:", year(tags.latest_update));
+    }
+    
+    if(tags.circumference) {           
+	appendTableRow(tabelle, "Umfang:", tags.circumference+' m');
+    }
+
+    if(tags.diameter_crown) {           
+	appendTableRow(tabelle, "Krone:", tags.diameter_crown+' m');
+    }
+
+    if(tags.height) {           
+	appendTableRow(tabelle, "Höhe:", tags.height+' m');
+    }
+
 
     /*
     let jetzt=dateNowISO();
