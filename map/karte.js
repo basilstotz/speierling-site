@@ -277,7 +277,7 @@ let slopeFilter = [
     'contrast:100%',
     'grayscale:0%',
     'hue:0deg',
-    'opacity:100%',
+    'opacity:40%',
     'invert:0%',
     'saturate:100%',
     'sepia:0%'
@@ -483,7 +483,7 @@ function  adaptZoom(){
     }
 
     if(slopeLayer){
-	slopeLayer.updateFilter( [ 'opacity:50%', 'grayscale:'+grayscale+'%' ] );
+	slopeLayer.updateFilter( [ 'opacity:30%', 'grayscale:'+grayscale+'%' ] );
     }
    
     //marker size

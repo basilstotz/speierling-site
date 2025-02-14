@@ -48,6 +48,11 @@ function portrait(parentElm,feature, diffs){
     appendTableRow(tabelle, 'Position:', '<a href="geo:'+lat+','+lon+'">'+lat+', '+lon+'</a>');
 
 
+    
+    if(tags.ele){
+	appendTableRow(tabelle, "Elevation:", tags.ele+' m');
+    }
+    
     if(tags.latest_update){
 	appendTableRow(tabelle, "Daten von:", year(tags.latest_update));
     }
