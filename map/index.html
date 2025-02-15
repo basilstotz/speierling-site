@@ -114,7 +114,7 @@
 
 	let sb=document.getElementById("sidebar");
 	if(sb.innerHTML==''){
-	    fetch('sidebar.html')
+	    fetch('sidebar.html?'+Math.random())
 		    .then((resp) => resp.text())
 		    .then(function(data) {
 			sb.innerHTML=data  
