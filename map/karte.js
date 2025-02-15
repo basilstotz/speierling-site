@@ -296,7 +296,7 @@ let slopeLayer = L.tileLayer.colorFilter('https://wmts.geo.admin.ch/1.0.0/ch.swi
     filter: slopeFilter
 });
 
-slopeLayer.addTo(map);
+//slopeLayer.addTo(map);
 
 
 
@@ -488,8 +488,12 @@ function  adaptZoom(){
 	distri.setStyle(function(feature){return { opacity:0.0,fillOpacity:fillOpacity,color:"#004400" }})
     }
 
-    if(slopeLayer){
-	slopeLayer.updateFilter( [ 'opacity:30%', 'grayscale:'+grayscale+'%' ] );
+    //slope
+    if(zoom>13){    // && zoom<17){
+	if(!map.hasLayer(slopeLayer))map.addLayer(slopeLayer);
+        slopeLayer.updateFilter( [ 'opacity:25%', 'grayscale:'+grayscale+'%' ] );
+    }else{
+	if(map.hasLayer(slopeLayer))map.removeLayer(slopeLayer);
     }
    
     //marker size
@@ -538,8 +542,10 @@ function doFader(){
 function fader(opacity,grayscale){
     
     let rest=100-opacity;
+    //let slope=Math.round(25*rest/100);
     esriLayer.updateFilter( [ 'opacity:'+opacity+'%', 'grayscale:'+grayscale+'%' ] );
     osmLayer.updateFilter( [ 'opacity:'+rest+'%', 'grayscale:'+grayscale+'%' ] );
+    //if(map.hasLayer(slopeLayer))slopeLayer( [ 'opacity:'+slope+'%', 'grayscale:'+grayscale+'%' ] );
     
 }
 
