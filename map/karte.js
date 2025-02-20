@@ -2,6 +2,10 @@
 
 //let treesGeojson;
 
+let searchItems=[];
+let globalGeo;
+
+
 function addParent(geojson){
 
     let indexed= {};
@@ -323,28 +327,168 @@ var gps = new L.Control.Gps({
 
 	gps.addTo(map);
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////// sdd gesojson layers   ////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////    search   ////////////////////////////////////////
 
-let relative=false;
+let mapState={};
+let filteredTreeLayer=false;
+let filtered=false;
 
-function addGeojsonLayer(responseText){
+function searchDisplay(geo){
 
-    // rapairTags and addParentIndex goes here
+    filtered=true;
+    mapState= { bounds: map.getBounds(), zoom: map.getZoom() };
 
-    let stageone =addParent(JSON.parse(responseText));
-    //let geojsonLayer= addGroth(stageone);
+    let st= document.getElementById('searchtext')
+    st.setAttribute('style','display:none');
+    search=st.value;
     
-    let geojsonLayer=stageone; 
+    let result= document.getElementById('searchresult');
+    result.setAttribute('style','display:inline-block;margin:2px');
+    result.innerHTML='&nbsp;<b>'+search+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
+
+    //let button = document.getElementById('searchbutton');
+    //button.setAttribute('style','display:inline-block');
     
-    let trees=L.geoJSON(geojsonLayer, {
+    //let st = document.getElementById('searchtext');
+    
+    let features=geo.features;
+    
+    let filteredTrees  = { type: 'FeatureCollection', features: [] }
+    
+    let bounds = L.latLngBounds();
+    for(let i=0;i<features.length;i++){
+	let feature=features[i];
+	let tags=feature.properties.tags;
+	let coords=feature.geometry.coordinates;
+
+	let arr= search.split(',');
+
+	let searchValue=arr[0].trim();
+	let found=false;
+	let value;
+	switch(arr.length){
+	case 3:
+	    value=tags['addr:gemeinde'];
+	    if(value==searchValue)found=true;
+	    break;
+	case 2:
+	    value=tags['addr:state']
+	    if(value==searchValue)found=true;
+	    break;
+	case 1:
+	    value=tags['addr:country']
+	    if(value==searchValue)found=true;
+	    break;
+	}
+	
+	if(found){
+	    if(coords[0] && coords[1]){
+		//let p=L.point(coords[0], coords[1]);
+		bounds.extend([ coords[1], coords[0] ] );
+		filteredTrees.features.push(feature);
+	    }
+	}
+    }
+
+    filteredTreeLayer=L.geoJSON(filteredTrees, {
         //style: style,
         //filter: filter,
         onEachFeature: onEachFeature,
         pointToLayer: pointToLayer
     });
 
+    /*
+    for(let i=0;i<features.length;i++){
+	let id=features[i].properties.id;
+	markerList[id].marker.setRadius(0);
+    }
+    */
+ 
+    if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
+    if(map.hasLayer(relative))map.removeLayer(relative);
+
+    map.flyToBounds(bounds.pad(0.0));
+
+    /*
+    for(let i=0;i<foundIds.length;i++){
+	let id=foundIds[i];
+	markerList[id].marker.setRadius(markerList[id].radius);
+    }
+    */
+    
+}
+
+function searchReset(){
+    filtered=false;
+    let st = document.getElementById('searchtext');
+    st.setAttribute('style','display:inline-block');
+    st.value='';
+    let sr=document.getElementById('searchresult');
+    sr.setAttribute('style','display:none');
+
+    map.flyToBounds(mapState.bounds, mapState.zoom);
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// sdd gesojson layers   ////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+let relative=false;
+let treeLayer=false;
+//let filteredTreeLayer=false;
+
+function addGeojsonLayer(responseText){
+
+    let geo=JSON.parse(responseText)
+    // rapairTags and addParentIndex goes here
+
+    let globalGeo=geo;
+    
+    search=[]
+    //let searchStrings=[];
+    let features=geo.features;
+    for(let i=0;i<features.length;i++){
+	//let label=features[i].properties.tags['addr:full']
+	let tags=features[i].properties.tags;
+	let country=tags['addr:country']
+	//if(country=='Schweiz/Suisse/Svizzera/Svizra')country='Schweiz';
+	//let label=country+', '+tags['addr:state']+', '+tags['addr:gemeinde']
+	let label=tags['addr:gemeinde']+', '+tags['addr:state']+', '+country
+	search.push(label);
+	//let search= [ tags['addr:gemeinde'], tags['addr:state'], country ]; 
+	//searchItems.push(search);
+    }
+    search.sort();
+    last='';
+    for(let i=0;i<search.length;i++){
+	let item=search[i];
+	if(item!=last){
+	    searchItems.push(item);
+	    last=item;
+	}
+    }
+	
+    autocomplete(globalGeo, document.getElementById('searchtext'),searchItems);
+    let sr = document.getElementById('searchresult');
+    sr.addEventListener('click', (e) => { searchReset() } );
+    
+    let stageone =addParent(geo);
+    //let geojsonLayer= addGroth(stageone);
+    
+    let geojsonLayer=stageone; 
+    
+    treeLayer=L.geoJSON(geojsonLayer, {
+        //style: style,
+        //filter: filter,
+        onEachFeature: onEachFeature,
+        pointToLayer: pointToLayer
+    });
+
+ 
+    
+    
     let relationGeojson=getRelationGeojson(geojsonLayer);
     relative=L.geoJSON( relationGeojson, {
         style: function(feature){return { opacity:0.15,color:"#000000" }}
@@ -354,7 +498,7 @@ function addGeojsonLayer(responseText){
     });
 
     relative.addTo(map);
-    trees.addTo(map);
+    treeLayer.addTo(map);
     stopSpinner();
 
 }
@@ -445,6 +589,23 @@ adaptZoom();
 function  adaptZoom(){
     
     let zoom=map.getZoom();
+
+    if(filtered){
+	if(filteredTreeLayer){
+            if(!map.hasLayer(filteredTreeLayer))map.addLayer(filteredTreeLayer);
+	}
+	if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
+    }else{
+	if(treeLayer){
+            if(!map.hasLayer(treeLayer))map.addLayer(treeLayer);
+	}
+	if(relative){
+            if(!map.hasLayer(relative))map.addLayer(relative);
+	}
+	if(filteredTreeLayer){
+	    if(map.hasLayer(filteredTreeLayer))map.removeLayer(filteredTreeLayer);
+	}
+    }
     
     //grayscale of osm map
     let v=(20-zoom)*10.0;
