@@ -33,19 +33,22 @@ function autocomplete(globalGeo, inp, arr) {
 	  /*append the DIV element as a child of the autocomplete container:*/
 	  this.parentNode.appendChild(a);
 	  /*for each item in the array...*/
-	  
           //let array=[];
 	  let search=val.toUpperCase();
+
+	  let carry=false;
 	  //filter gemeinde
 	  let gemeinde=[];
 	  for(let i=0;i<arr.length;i++){
 	      let items=arr[i].split(',')
+	      if( items[0].trim()==items[1].trim() )
+		  carry=true;
 	      let item=items[0].toUpperCase();
 	      if(item.includes(search))gemeinde.push(arr[i]);
 	  }
 	  //filter kanton
 	  let kanton=[];
-          if(gemeinde.length==0){
+          if( (gemeinde.length==0) || carry){
 	      for(let i=0;i<arr.length;i++){
 		 let items=arr[i].split(',')
 		  let item=items[1].toUpperCase();

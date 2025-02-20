@@ -343,7 +343,7 @@ function searchDisplay(geo){
     search=st.value;
     
     let result= document.getElementById('searchresult');
-    result.setAttribute('style','display:inline-block;margin:2px');
+    result.setAttribute('style','display:inline-block;margin:3px;border-radius:5px');
     result.innerHTML='&nbsp;<b>'+search+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
 
     //let button = document.getElementById('searchbutton');
@@ -407,7 +407,7 @@ function searchDisplay(geo){
     if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
     if(map.hasLayer(relative))map.removeLayer(relative);
 
-    map.flyToBounds(bounds.pad(0.0));
+    map.flyToBounds(bounds.pad(0.2));
 
     /*
     for(let i=0;i<foundIds.length;i++){
@@ -596,14 +596,14 @@ function  adaptZoom(){
 	}
 	if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
     }else{
-	if(treeLayer){
-            if(!map.hasLayer(treeLayer))map.addLayer(treeLayer);
+	if(filteredTreeLayer){
+	    if(map.hasLayer(filteredTreeLayer))map.removeLayer(filteredTreeLayer);
 	}
 	if(relative){
             if(!map.hasLayer(relative))map.addLayer(relative);
 	}
-	if(filteredTreeLayer){
-	    if(map.hasLayer(filteredTreeLayer))map.removeLayer(filteredTreeLayer);
+	if(treeLayer){
+            if(!map.hasLayer(treeLayer))map.addLayer(treeLayer);
 	}
     }
     

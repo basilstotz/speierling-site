@@ -88,19 +88,13 @@
 
   <div id="spinner" class="spinner"></div>
 
-  <a id="homelink"><img src="images/home.png" id="home"></a>
 
-  <div class="autocomplete" style="width:200;position:fixed;top:12px;right:60px;z-index:5;background-color:white;font-size:0.7em">
+  <div class="autocomplete" style="background-color:#eeeeee;width:200;position:fixed;top:12px;right:60px;z-index:5;font-size:0.7em">
     <input type="text" size="70" id="searchtext" placeholder="Suche ..." autocomplete="off">
     <p id="searchresult" style="display:none"></p>
-    <!--<button style="display:none" id="searchbutton">&#x232B;</button>-->
   </div>
   
-  <div style="overflow:auto;display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px;font-size:12px" id="sidebar"></div>
 
-  <div id="button" style="transition:1s;transition-delay:1s;opacity:1.0;z-index:4;position:fixed;top:10px;right:10px">
-    <button onclick="sidebar_open()"><b>?</b></button>
-  </div>
  
   <div style="z-index:1" class="full-height"  id="map"></div>
 
@@ -117,10 +111,29 @@
                 break;
          }
     }
+  </script>
 
+
+  
+    // homelink
+    <a id="homelink"><img src="images/home.png" id="home"></a>
+
+  <script>
     let home=document.getElementById('homelink');
     home.href=window.location.href.replace('/map','');
+  </script>
 
+
+  
+    //sidebar
+    <div id="button" style="transition:1s;transition-delay:1s;opacity:1.0;z-index:4;position:fixed;top:10px;right:10px">
+       <button onclick="sidebar_open()"><b>?</b></button>
+    </div>
+
+
+    <div style="overflow:auto;display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px;font-size:12px" id="sidebar"></div>
+
+    <script>
     function sidebar_content(){
 
 	let sb=document.getElementById("sidebar");
