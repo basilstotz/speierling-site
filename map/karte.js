@@ -340,7 +340,7 @@ function searchDisplay(geo){
 
     let st= document.getElementById('searchtext')
     st.setAttribute('style','display:none');
-    search=st.value;
+    search=st.value.replaceAll('&nbsp;','');
     
     let result= document.getElementById('searchresult');
     result.setAttribute('style','display:inline-block;margin:3px;border-radius:5px');

@@ -36,37 +36,36 @@ function autocomplete(globalGeo, inp, arr) {
           //let array=[];
 	  let search=val.toUpperCase();
 
-	  let carry=false;
+	  //let carry=false;
 	  //filter gemeinde
 	  let gemeinde=[];
 	  for(let i=0;i<arr.length;i++){
 	      let items=arr[i].split(',')
-	      if( items[0].trim()==items[1].trim() )
-		  carry=true;
+	      //if( items[0].trim()==items[1].trim() )carry=true;
 	      let item=items[0].toUpperCase();
 	      if(item.includes(search))gemeinde.push(arr[i]);
 	  }
 	  //filter kanton
 	  let kanton=[];
-          if( (gemeinde.length==0) || carry){
+          //if( (gemeinde.length==0) || carry){
 	      for(let i=0;i<arr.length;i++){
 		 let items=arr[i].split(',')
 		  let item=items[1].toUpperCase();
 		  let newItem=items.toSpliced(0,1).join(', ');
-		 if(item.includes(search))kanton.push(newItem);
+		 if(item.includes(search))kanton.push('&nbsp;&nbsp;&nbsp;'+newItem);
 	      }
-	  }
+	  //}
           kanton=unique(kanton)
 	  //filter land
 	  let land=[];
-          if(kanton.length==0){
+          //if(kanton.length==0){
 	      for(let i=0;i<arr.length;i++){
 		 let items=arr[i].split(',')
 		 let item=items[2].toUpperCase();
 		  let newItem=items.toSpliced(0,2).join(', ');
-		 if(item.includes(search))land.push(newItem);
+		 if(item.includes(search))land.push('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+newItem);
 	      }
-	  }
+	  //}
 	  land=unique(land);
 	  
 	  let array=gemeinde.concat(kanton,land)
