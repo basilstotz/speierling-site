@@ -348,7 +348,7 @@ function searchDisplay(geo){
     
     let result= document.getElementById('searchresult');
     result.setAttribute('style','display:inline-block;margin:3px;border-radius:5px');
-    result.innerHTML='&nbsp;<b>'+search.trim()+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
+    result.innerHTML='&nbsp;<b>'+st.value.trim()+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
     
     let features=geo.features;
     
