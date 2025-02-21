@@ -345,11 +345,6 @@ function searchDisplay(geo){
     let result= document.getElementById('searchresult');
     result.setAttribute('style','display:inline-block;margin:3px;border-radius:5px');
     result.innerHTML='&nbsp;<b>'+search+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
-
-    //let button = document.getElementById('searchbutton');
-    //button.setAttribute('style','display:inline-block');
-    
-    //let st = document.getElementById('searchtext');
     
     let features=geo.features;
     
@@ -362,31 +357,23 @@ function searchDisplay(geo){
 	let coords=feature.geometry.coordinates;
 
 	let arr= search.split(',');
-
-	let searchValue=arr[0].trim();
-	let found=false;
 	let value;
 	switch(arr.length){
 	case 3:
 	    value=tags['addr:gemeinde'];
-	    if(value==searchValue)found=true;
 	    break;
 	case 2:
 	    value=tags['addr:state']
-	    if(value==searchValue)found=true;
 	    break;
 	case 1:
 	    value=tags['addr:country']
-	    if(value==searchValue)found=true;
 	    break;
 	}
-	
-	if(found){
-	    if(coords[0] && coords[1]){
-		//let p=L.point(coords[0], coords[1]);
-		bounds.extend([ coords[1], coords[0] ] );
-		filteredTrees.features.push(feature);
-	    }
+	let searchValue=arr[0].trim();
+
+	if(value==searchValue){
+	    bounds.extend([ coords[1], coords[0] ] );
+	    filteredTrees.features.push(feature);
 	}
     }
 
@@ -398,24 +385,11 @@ function searchDisplay(geo){
     });
 
     /*
-    for(let i=0;i<features.length;i++){
-	let id=features[i].properties.id;
-	markerList[id].marker.setRadius(0);
-    }
-    */
- 
     if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
     if(map.hasLayer(relative))map.removeLayer(relative);
-
     map.flyToBounds(bounds.pad(0.2));
-
-    /*
-    for(let i=0;i<foundIds.length;i++){
-	let id=foundIds[i];
-	markerList[id].marker.setRadius(markerList[id].radius);
-    }
     */
-    
+    fly(bounds.pad(0.2));
 }
 
 function searchReset(){
@@ -426,10 +400,22 @@ function searchReset(){
     let sr=document.getElementById('searchresult');
     sr.setAttribute('style','display:none');
 
+    /*
+    if(map.hasLayer(filteredTreeLayer))map.removeLayer(filteredTreeLayer);
     map.flyToBounds(mapState.bounds, mapState.zoom);
-
+    */
+    fly(mapState.bounds);
 }
 
+
+function fly(bounds){
+
+    if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
+    if(map.hasLayer(relative))map.removeLayer(relative);
+    if(map.hasLayer(filteredTreeLayer))map.removeLayer(filteredTreeLayer);
+
+    map.flyToBounds(bounds)
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////// sdd gesojson layers   ////////////////////////////////////
@@ -590,15 +576,12 @@ function  adaptZoom(){
     
     let zoom=map.getZoom();
 
+    // add trees and relative after flyToBounds
     if(filtered){
 	if(filteredTreeLayer){
             if(!map.hasLayer(filteredTreeLayer))map.addLayer(filteredTreeLayer);
 	}
-	if(map.hasLayer(treeLayer))map.removeLayer(treeLayer);
     }else{
-	if(filteredTreeLayer){
-	    if(map.hasLayer(filteredTreeLayer))map.removeLayer(filteredTreeLayer);
-	}
 	if(relative){
             if(!map.hasLayer(relative))map.addLayer(relative);
 	}
