@@ -340,11 +340,15 @@ function searchDisplay(geo){
 
     let st= document.getElementById('searchtext')
     st.setAttribute('style','display:none');
+
     search=st.value.replaceAll('&nbsp;','');
+    search=search.replace('(',', ');
+    search=search.replace(')','');
+    search=search.replace(' ,',',');
     
     let result= document.getElementById('searchresult');
     result.setAttribute('style','display:inline-block;margin:3px;border-radius:5px');
-    result.innerHTML='&nbsp;<b>'+search+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
+    result.innerHTML='&nbsp;<b>'+search.trim()+'&nbsp;&nbsp;&#x232B;&nbsp</b>';
     
     let features=geo.features;
     
