@@ -285,7 +285,7 @@ let slopeFilter = [
     'blur:0px',
     'brightness:100%',
     'contrast:100%',
-    'grayscale:0%',
+    'grayscale:100%',
     'hue:0deg',
     'opacity:40%',
     'invert:0%',
@@ -293,7 +293,10 @@ let slopeFilter = [
     'sepia:0%'
 ];
 
+//ch.blw.hang_steillagen
 
+//https://wmts.geo.admin.ch/1.0.0/ch.blw.hang_steillagen/default/current/3857/{z}/{x}/{y}.png
+//https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.hangneigung-ueber_30/default/current/3857/{z}/{x}/{y}.png
 let slopeLayer = L.tileLayer.colorFilter('https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.hangneigung-ueber_30/default/current/3857/{z}/{x}/{y}.png', {
     maxZoom: 20,
     attribution: '© SwissTopo',
@@ -479,6 +482,7 @@ function addGeojsonLayer(responseText){
  
     
     
+    
     let relationGeojson=getRelationGeojson(geojsonLayer);
     relative=L.geoJSON( relationGeojson, {
         style: function(feature){return { opacity:0.15,color:"#000000" }}
@@ -490,6 +494,20 @@ function addGeojsonLayer(responseText){
     relative.addTo(map);
     treeLayer.addTo(map);
     stopSpinner();
+
+}
+
+let aspect;
+function addSlopeLayer(responseText){
+    let slopeLayer=JSON.parse(responseText);
+    aspect=L.geoJSON(slopeLayer, {
+        style: function(feature){return { opacity:1.0,fillOpacity:1.0,color:"#ff0000" }}
+        //filter: filter,
+        //onEachFeature: onEachFeature,
+        //pointToLayer: pointToLayer
+    });
+
+    aspect.addTo(map);
 
 }
 
@@ -563,6 +581,9 @@ function httpGet(theUrl, callback){
 httpGet('Rect.geojson', addGeojsonRect);
 
 httpGet('Sorbus_domestica_plg.geojson', addGeojsonDistri);
+
+httpGet('../data/slope.geojson', addSlopeLayer);
+
 
 httpGet('../data/sorbusdomestica.geojson', addGeojsonLayer);
 
