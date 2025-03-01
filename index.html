@@ -191,17 +191,20 @@ const defaults = {
 function shoot() {
   confetti({
     ...defaults,
-    particleCount: 40,
-    scalar: 1.2,
-    shapes: ["star"],
+    particleCount: 100,
+    scalar: 3,
+      shapes: ["image"],
+      shapeOptions: image: [ { src: 'blatt.png',width:32, height:32 } ]
   });
 
+/*
   confetti({
     ...defaults,
     particleCount: 10,
     scalar: 0.75,
     shapes: ["circle"],
   });
+*/
 }
 
 let num;
