@@ -301,8 +301,13 @@ function tops(contentElm,feature,diffs){
     minimapElm.setAttribute('id','karte'+id);
     minimapElm.setAttribute('style','margin-left:5px;margin-bottom:5px;height:150px;width:150px;float:left');
 
+   
     let mapurl='https://openstreetmap.org/'+feature.id;
-    minimapElm.addEventListener('click', ()=>{ window.open(mapurl) });
+    minimapElm.addEventListener('blclick', ()=>{ window.open(mapurl) });
+  
+    let terrainPfad='../data/'+feature.id+'/';
+    minimapElm.addEventListener('click', ()=>{ showTerrain(terrainPfad) });
+
     contentElm.appendChild(minimapElm);
 
     miniMap(feature);

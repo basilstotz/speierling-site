@@ -66,6 +66,15 @@
    <script src="autocomplete.js"></script>
    <link rel="stylesheet" href="autocomplete.css"/>
    
+   <!-- terrain -->
+   <script src="terrain/p5/p5.min.js"></script>
+   <script src="terrain/sketch.js"></script>
+   <link rel="stylesheet" href="terrain/terrain.css"/>
+   <script>
+    function stopTerrain(){
+        document.getElementById('container').setAttribute('style','display:none');
+    }
+   </script>
    
    <script>
       function stopSpinner() {
@@ -93,8 +102,14 @@
     <input type="text" size="70" id="searchtext" placeholder="Suche ..." autocomplete="off">
     <p id="searchresult" style="display:none"></p>
   </div>
-  
 
+  <!-- terrain -->
+  <div class="centered container" id="container" style="display:none">
+    <p onClick="stopTerrain()" style="margin:0px;margin-right:3px;text-align:right">&#10006;</p>
+    <canvas id="terrain" width="900px" height="600px"></canvas>
+  </div>
+
+  
  
   <div style="z-index:1" class="full-height"  id="map"></div>
 
