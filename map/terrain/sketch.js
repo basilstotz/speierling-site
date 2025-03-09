@@ -9,9 +9,10 @@ var show = (p) => {
 	})
     }
     
-    p.updateImage = async function(pfad){
+    p.updateImage = async function(pfad,color){
 	p.auszug = await p.loadImagePromise(pfad+'dem-512.png');
 	p.texte = await p.loadImagePromise(pfad+'esri-512.png');
+	p.treeColor=color;
 	p.makeModels()
 	p.cam.camera(0,-400,800,0,-100,0);
     }
@@ -35,7 +36,6 @@ var show = (p) => {
 	
 	p.d=0;
 
-	p.min=10000;
 	//p.size=1024;
         //p.auszug=p.createGraphics(p.size,p.size);
 	//p.debugMode();
@@ -138,6 +138,7 @@ var show = (p) => {
     }
 */
     p.makeGrid = () => {
+	p.min=10000;
 	let width=p.auszug.width;
 	let height=p.auszug.height;
 	p.grid= new Uint16Array(width*height);
@@ -149,7 +150,10 @@ var show = (p) => {
 	    p.grid[i]=ele;
 	}
 
+	
         for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-100;
+	//console.log(p.min);
+	//console.log(p.grid);
 	
 	p.rows=width;
 	p.cols=height;
@@ -157,7 +161,7 @@ var show = (p) => {
 	p.h=p.sy*p.cols;
 	//console.log(p.grid);
 	p.d=0;
-	console.log(p.d);
+	//console.log(p.d);
     }
 
 
@@ -247,7 +251,8 @@ var show = (p) => {
 	    let my=Math.round(p.cols/2)
 	    let mz=p.getGrid(mx,my);
 	    p.push();
-	    p.emissiveMaterial(0,255,0)
+	    //let color = p.color(255,0,0);
+	    p.fill(p.treeColor)
 	    p.translate(mx*p.sx,my*p.sy,mz*p.sz);
 	    p.sphere(5);
 	    p.pop()
@@ -265,9 +270,9 @@ var show = (p) => {
 
 let terrain;
 
-async function showTerrain(pfad){
+async function showTerrain(pfad,color){
     if(!terrain)terrain  = new p5(show);
-    await terrain.updateImage(pfad)
-    document.getElementById('container').setAttribute('style','display:block');
+    await terrain.updateImage(pfad,color)
+    document.getElementById('terrainBackground').setAttribute('style','display:block');
 }
 

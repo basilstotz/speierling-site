@@ -180,6 +180,23 @@ function titel(parentElm,feature){
 
 }
 
+function propagationColor(propagation){
+     let color='black';
+    if(propagation){
+       switch(propagation){
+         case 'natural': color='lightgreen';break;
+         case 'sucker': color='yellow';break;
+         case 'planted': color='dodgerblue';break;
+         case 'seed': color='tomato';break;
+         case 'graft': color='orange';break;
+         case 'cutting': color='orange';break;
+         default: color='white';break;
+         }
+    }
+    return color;
+}
+
+
 function miniMap(feature){
     
     let lon=feature.geometry.coordinates[0];
@@ -205,6 +222,10 @@ function miniMap(feature){
 
     L.control.scale({imperial:false}).addTo(map);
 
+
+    color=propagationColor(feature.properties.tags.propagation);
+
+    /*
     let color='black';
     if(feature.properties.tags.propagation){
        switch(feature.properties.tags.propagation){
@@ -217,6 +238,7 @@ function miniMap(feature){
          default: color='white';break;
          }
     }
+    */
     
     let circle = L.circle([lat, lon], {
 	color: color,
@@ -300,13 +322,15 @@ function tops(contentElm,feature,diffs){
     let minimapElm=document.createElement('p');
     minimapElm.setAttribute('id','karte'+id);
     minimapElm.setAttribute('style','margin-left:5px;margin-bottom:5px;height:150px;width:150px;float:left');
-
-   
+ 
+    /*  
     let mapurl='https://openstreetmap.org/'+feature.id;
     minimapElm.addEventListener('blclick', ()=>{ window.open(mapurl) });
-  
+    */
+    
     let terrainPfad='../data/'+feature.id+'/';
-    minimapElm.addEventListener('click', ()=>{ showTerrain(terrainPfad) });
+    let color=propagationColor(feature.properties.tags.propagation);
+    minimapElm.addEventListener('click', ()=>{ showTerrain(terrainPfad,color) });
 
     contentElm.appendChild(minimapElm);
 

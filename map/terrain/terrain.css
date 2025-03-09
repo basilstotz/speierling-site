@@ -12,10 +12,23 @@
 .container {
     z-index:10;
     border-style: solid;
-    border-color: lightgrey;
-    background-color: lightgrey;
+    border-color: black;
+    background-color: black;
     width: 906px;
     border-radius: 10px;
     animation-name: terrain;
     animation-duration: 0.4s;
+}
+.terrain {
+    z-index: 9;
+    backgound-color:black;
+    opacity:0.7
+}
+.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom:0;
+    right:0;
+   
 }
