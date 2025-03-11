@@ -1,3 +1,71 @@
+//    p.getSlope = (data,ncols,x,y) =>{
+
+
+function colorToEle(pixels, idx){
+	idx*=4;
+	let red = pixels[idx+0];     
+	let green = pixels[idx+1];     
+	let blue = pixels[idx+2];     
+	return ( (red * 256 * 256 + green * 256 + blue) * 0.1) - 10000 
+	//return ( (red<<16 + green<<8 + blue) * 0.1) - 10000 
+}
+
+
+function getSlope(data,ncols,x,y){
+    /* on image data
+    function H(idx){
+        const i=4*idx:
+        return (data[i+0]*256+data[i+1])/10.0
+    }
+    */
+
+	function H(idx){
+            return data[idx]
+	}
+    
+	let slope;
+	let aspect;
+
+	let zFactor=1.0/90.0
+
+	let r=ncols;
+	let i=y*ncols+x
+
+	let H11 = H(i-r-1);
+	let H12 = H(i-r);
+	let H13 = H(i-r+1);
+	let H21 = H(i-1)
+	let H22 = H(i);
+	let H23 = H(i+1);
+	let H31 = H(i+r-1);
+	let H32 = H(i+r);
+	let H33 = H(i+r+1);
+
+	let dzdy = ( H11 + 2*H12 + H13 - H31 - 2*H32 - H33 ) / 4.0
+	let dzdx = ( H11 + 2*H21 + H31 - H13 - 2*H23 - H33 ) / 4.0
+	 //console.log(N+' '+S+' '+E+' '+W);
+
+	let dx=1;
+	let dy=1;
+
+	dzdx= dzdx/dx;
+	dzdy= dzdy/dy;
+
+	let d2=zFactor*Math.sqrt( dzdx*dzdx + dzdy*dzdy)
+
+	//if(d2>0)console.log(d2+' '+dzdy+' '+dzdx);
+
+	//slope=Math.atan(d2);
+	slope=d2;
+	aspect =  Math.atan2( dzdy, dzdx );
+
+	let ans = { ele: H22, slope: slope, aspect: aspect };
+	console.log(ans);
+	return ans;
+}
+
+
+
 
 var show = (p) => {
 
@@ -33,7 +101,8 @@ var show = (p) => {
 	//console.log(p.cvs);
 	p.sx=15;
 	p.sy=15;
-	p.sz=0.15
+	p.sz=1.5;
+	p.bottom= 100;
 	
 	p.d=0;
 
@@ -140,70 +209,7 @@ var show = (p) => {
 */
 
   
-    
-    p.getSlope = (data,ncols,x,y) =>{
-
-    /* on image data
-    function H(idx){
-        const i=4*idx:
-        return (data[i+0]*256+data[i+1])/10.0
-    }
-    */
-
-	function H(idx){
-            return data[idx]
-	}
-    
-	let slope;
-	let aspect;
-
-	let zFactor=1.0/90.0
-
-	let r=ncols;
-	let i=y*ncols+x
-
-	let H11 = H(i-r-1);
-	let H12 = H(i-r);
-	let H13 = H(i-r+1);
-	let H21 = H(i-1)
-	let H22 = H(i);
-	let H23 = H(i+1);
-	let H31 = H(i+r-1);
-	let H32 = H(i+r);
-	let H33 = H(i+r+1);
-
-	let dzdy = ( H11 + 2*H12 + H13 - H31 - 2*H32 - H33 ) / 4.0
-	let dzdx = ( H11 + 2*H21 + H31 - H13 - 2*H23 - H33 ) / 4.0
-	 //console.log(N+' '+S+' '+E+' '+W);
-
-	let dx=1;
-	let dy=1;
-
-	dzdx= dzdx/dx;
-	dzdy= dzdy/dy;
-
-	let d2=zFactor*Math.sqrt( dzdx*dzdx + dzdy*dzdy)
-
-	//if(d2>0)console.log(d2+' '+dzdy+' '+dzdx);
-
-	//slope=Math.atan(d2);
-	slope=d2;
-	aspect =  Math.atan2( dzdy, dzdx );
-
-	let ans = { ele: H22, slope: slope, aspect: aspect };
-	console.log(ans);
-	return ans;
-    }
-
-    
-    p.elevation = ( array, idx) => {
-	let red = array[idx+0];     
-	let green = array[idx+1];     
-	let blue = array[idx+2];     
-	return ( (red * 256 * 256 + green * 256 + blue) * 0.1) - 10000 
-	//return ( (red<<16 + green<<8 + blue) * 0.1) - 10000 
-    }
-    
+        
     p.makeGrid = () => {
 	p.min=10000;
 	let width=p.auszug.width;
@@ -212,15 +218,14 @@ var show = (p) => {
 	
 	p.auszug.loadPixels();
 	for (let i=0; i<p.grid.length; i+=1) {
-	    const idx=4*i;
 	    //const ele= (p.auszug.pixels[idx]*256+p.auszug.pixels[idx+1]);
-	    const ele= 10*p.elevation(p.auszug.pixels,idx);  //Uintarry ?????????????????
+	    const ele= colorToEle(p.auszug.pixels,i);  //Uintarry ?????????????????
 	    if(ele<p.min)p.min=ele;
 	    p.grid[i]=ele;
 	}
 
 	
-        for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-1000;
+        for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-p.bottom;
 	//console.log(p.min);
 	//console.log(p.grid);
 	
@@ -272,7 +277,7 @@ var show = (p) => {
 	p.mx = Math.round(p.rows/2)
 	p.my = Math.round(p.cols/2)
 	p.mz = p.getGrid(p.mx,p.my);
-	p.slope = p.getSlope(p.grid,p.cols,p.mx,p.my);
+	p.slope = getSlope(p.grid,p.cols,p.mx,p.my);
 
 	if(p.landschaft)p.freeGeometry(p.landschaft);
 	if(p.box)p.freeGeometry(p.box);
