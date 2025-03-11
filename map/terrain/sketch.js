@@ -1,8 +1,8 @@
 //    p.getSlope = (data,ncols,x,y) =>{
 
 
-function colorToEle(pixels, idx){
-	idx*=4;
+function PixelToEle(pixels, idx){
+	//idx*=4;
 	let red = pixels[idx+0];     
 	let green = pixels[idx+1];     
 	let blue = pixels[idx+2];     
@@ -214,16 +214,17 @@ var show = (p) => {
 	p.min=10000;
 	let width=p.auszug.width;
 	let height=p.auszug.height;
-	p.grid= new Uint16Array(width*height);
+	p.grid= new Float32Array(width*height);     //           Uint16Array(width*height);
 	
 	p.auszug.loadPixels();
-	for (let i=0; i<p.grid.length; i+=1) {
+//console.log(p.auszug.pixels)
+	for (let i=0; i<p.grid.length; i++) {
 	    //const ele= (p.auszug.pixels[idx]*256+p.auszug.pixels[idx+1]);
-	    const ele= colorToEle(p.auszug.pixels,i);  //Uintarry ?????????????????
+	    const ele= PixelToEle(p.auszug.pixels,4*i);  //Uintarry ?????????????????
 	    if(ele<p.min)p.min=ele;
 	    p.grid[i]=ele;
 	}
-
+//console.log(p.grid)
 	
         for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-p.bottom;
 	//console.log(p.min);
@@ -278,7 +279,7 @@ var show = (p) => {
 	p.my = Math.round(p.cols/2)
 	p.mz = p.getGrid(p.mx,p.my);
 	p.slope = getSlope(p.grid,p.cols,p.mx,p.my);
-
+console.log(p.slope);
 	if(p.landschaft)p.freeGeometry(p.landschaft);
 	if(p.box)p.freeGeometry(p.box);
 	p.landschaft = new p5.Geometry(1,1,p.createShape)
@@ -332,8 +333,8 @@ var show = (p) => {
 	p.strokeWeight(3);
 	p.angleMode(p.RADIANS);
 	p.colorMode(p.RGB);
-	    let lx=3*p.slope.slope*Math.cos(p.slope.aspect);
-	    let ly=3*p.slope.slope*Math.sin(p.slope.aspect);
+	    let lx=30*p.slope.slope*Math.cos(p.slope.aspect);
+	    let ly=30*p.slope.slope*Math.sin(p.slope.aspect);
 	    p.line( 0, 0, 0 ,lx ,ly ,0 )
 	    //p.line( lx,ly,0,lx,ly,-slope.slope)
 	    
