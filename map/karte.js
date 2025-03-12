@@ -70,6 +70,42 @@ function getRelationGeojson(geojson){
     return relationGeojson;
 }
 
+function getSlopeGeojson(geojson){
+
+    let slopeGeojson= { type: "FeatureCollection", features: [] };
+    const factor=0.002;
+    
+    for(let i=0;i<geojson.features.length;i++){
+        let feature=geojson.features[i];
+        if(feature.properties.tags.slope){
+	    let tags=feature.properties.tags;
+            let aspect=tags.aspect;
+	    let slope=tags.slope;
+            let coords=feature.geometry.coordinates;
+            let  lon = coords[0];
+	    let lat = coords[1];
+	    
+	    let dy= Math.sin(aspect)*slope*factor;
+            let dx= Math.cos(aspect)*slope*factor;
+            let lat2=lat+dy;
+            let lon2=lon+dx;
+	    
+            let item={ "type": "Feature",
+                       "properties": {},
+                       "geometry": {
+                              "type": "LineString",
+                           "coordinates": [ [ lon,lat] , [ lon2, lat2 ] ]
+                       }
+                     };
+            slopeGeojson.features.push(item);
+        }
+
+    }
+    return slopeGeojson;
+    console.log(slopeGeojson);
+}
+
+
 ///////////////////////////////////////marker////////////////////////////////////////
 
 let markerList = {};
@@ -429,7 +465,8 @@ function fly(bounds){
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 let relative=false;
-let treeLayer=false;
+    let treeLayer=false;
+    let aspectLayer=false;
 //let filteredTreeLayer=false;
 
 function addGeojsonLayer(responseText){
@@ -481,8 +518,7 @@ function addGeojsonLayer(responseText){
 
  
     
-    
-    
+
     let relationGeojson=getRelationGeojson(geojsonLayer);
     relative=L.geoJSON( relationGeojson, {
         style: function(feature){return { opacity:0.15,color:"#000000" }}
@@ -491,12 +527,21 @@ function addGeojsonLayer(responseText){
         //pointToLayer: pointToLayer
     });
 
+    let slopeGeojson=getSlopeGeojson(geojsonLayer);
+    aspectLayer=L.geoJSON(slopeGeojson, {
+        style: function(feature){return { opacity:1.0,fillOpacity:1.0,color:"#ff0000" }}
+        //filter: filter,
+        //onEachFeature: onEachFeature,
+        //pointToLayer: pointToLayer
+    });
+    
+    aspectLayer.addTo(map);
     relative.addTo(map);
     treeLayer.addTo(map);
     stopSpinner();
 
 }
-
+/*
 let aspect;
 function addSlopeLayer(responseText){
     let slopeLayer=JSON.parse(responseText);
@@ -510,7 +555,7 @@ function addSlopeLayer(responseText){
     aspect.addTo(map);
 
 }
-
+*/
 let distri=false;
 
 function addGeojsonDistri(responseText){
@@ -582,7 +627,7 @@ httpGet('Rect.geojson', addGeojsonRect);
 
 httpGet('Sorbus_domestica_plg.geojson', addGeojsonDistri);
 
-httpGet('../data/slope.geojson', addSlopeLayer);
+//httpGet('../data/slope.geojson', addSlopeLayer);
 
 
 httpGet('../data/sorbusdomestica.geojson', addGeojsonLayer);

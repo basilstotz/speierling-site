@@ -101,8 +101,8 @@ var show = (p) => {
 	//console.log(p.cvs);
 	p.sx=15;
 	p.sy=15;
-	p.sz=1.5;
-	p.bottom= 100;
+	p.sz=15;
+	p.bottom= 10;
 	
 	p.d=0;
 
@@ -330,11 +330,15 @@ console.log(p.slope);
 	    let c = p.color(phi,100,100)
 	    p.stroke(phi,85,90);
 	    //p.fill(c)
-	p.strokeWeight(3);
-	p.angleMode(p.RADIANS);
-	p.colorMode(p.RGB);
-	    let lx=30*p.slope.slope*Math.cos(p.slope.aspect);
-	    let ly=30*p.slope.slope*Math.sin(p.slope.aspect);
+	    
+	    p.angleMode(p.RADIANS);
+	    p.colorMode(p.RGB);
+	    let lx=200*p.slope.slope*Math.cos(p.slope.aspect);
+	    let ly=200*p.slope.slope*Math.sin(p.slope.aspect);
+
+	    //let ll=Math.sqrt(lx*lx+ly*ly);
+	    
+	    p.strokeWeight(3);
 	    p.line( 0, 0, 0 ,lx ,ly ,0 )
 	    //p.line( lx,ly,0,lx,ly,-slope.slope)
 	    

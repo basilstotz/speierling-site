@@ -53,9 +53,54 @@ function portrait(parentElm,feature, diffs){
 	appendTableRow(tabelle, "Elevation:", tags.ele+' m');
     }
 
+    if(tags.slope){
+	appendTableRow(tabelle, "Hangneigung:", Math.round(tags.slope*50)+' %');
+    }
 
-    let propagation;
+    
+    if(tags.aspect){
+	let name;
+	let phi=tags.aspect*(180/Math.PI);
+	if(phi<0)phi+=360;
+	let sektor=Math.round(phi/45);
+        switch(sektor){
+	case 0:
+	    name='Ost';
+	    break;
+	case 1:
+	    name='Nordost';
+	    break;
+	case 2:
+	    name='Nord';
+	    break;
+	case 3:
+	    name='Nordwest';
+	    break;
+	case 4:
+	    name='West';
+	    break;
+	case 5:
+	    name='Südwest';
+	    break;
+	case 6:
+	    name='Süd';
+	    break;
+	case 7:
+	    name='Südost';
+	    break;
+	case 8:
+	    name='Ost';
+	    break;
+	default:
+	    name='?????';
+	    break;
+	}
+	if(tags.slope>0.05)appendTableRow(tabelle, "Exposition:", name);
+    }
+
+    
     if(tags.propagation){
+	let propagation;
 	switch(tags.propagation){
         case 'natural':                                                                                           
             propagation='natürlich'
@@ -104,10 +149,11 @@ function portrait(parentElm,feature, diffs){
 	appendTableRow(tabelle, "Krone:", tags.diameter_crown+' m');
     }
 
+    
     if(tags.height) {           
-	appendTableRow(tabelle, "Höhe:", tags.height+' m');
+	appendTableRow(tabelle, "Höhe:", Math.round(tags.height)+' m');
     }
-
+   
 
     /*
     let jetzt=dateNowISO();
