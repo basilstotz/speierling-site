@@ -529,7 +529,12 @@ function addGeojsonLayer(responseText){
 
     let slopeGeojson=getSlopeGeojson(geojsonLayer);
     aspectLayer=L.geoJSON(slopeGeojson, {
-        style: function(feature){return { opacity:1.0,fillOpacity:1.0,color:"#ff0000" }}
+        style: function(feature){return {
+	    
+
+	    
+	    opacity:1.0,fillOpacity:1.0,color:"#ff0000"
+	}}
         //filter: filter,
         //onEachFeature: onEachFeature,
         //pointToLayer: pointToLayer
