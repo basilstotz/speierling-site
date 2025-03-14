@@ -116,7 +116,7 @@ var show = (p) => {
 	})
     }
     
-    p.updateImage = async function(pfad,color,radius=3){
+    p.updateImage = async function(pfad,color,tags){
 	try {
 	    p.auszug = await p.loadImagePromise(pfad+'dem-512.png');
 	    p.texte = await p.loadImagePromise(pfad+'esri-512.png');
@@ -124,7 +124,9 @@ var show = (p) => {
 	    console.log('error reading images');
 	}
 	p.treeColor=color;
-	p.treeRadius=radius;
+	p.treeRadius=3;
+	p.slope = { ele: tags.height, slope: tags.slope, aspect: tags.aspect }
+	console.log(tags);
 	p.makeModels()
 	p.cam.camera(0,-400,800,0,-100,0);
     }
@@ -345,8 +347,8 @@ console.log(p.grid);
 	p.mx = Math.round(p.rows/2)
 	p.my = Math.round(p.cols/2)
 	p.mz = p.getGrid(p.mx,p.my);
-	p.slope = getSlope(p.grid.data,p.cols,p.mx,p.my);
-console.log(p.slope);
+	
+//console.log(p.slope);
 	if(p.landschaft)p.freeGeometry(p.landschaft);
 	if(p.box)p.freeGeometry(p.box);
 	p.landschaft = new p5.Geometry(1,1,p.createShape)
@@ -386,7 +388,7 @@ console.log(p.slope);
 	    //slope
 	    p.colorMode(p.HSB);
 	    p.angleMode(p.DEGREES);
-	    let phi = p.slope.aspect*(180/Math.PI)-90;
+	    let phi = p.slope.aspect*(180/Math.PI)+90;
 	    if(phi<0)phi=phi+360;
 	    if(phi>360)phi=phi-360;
 
@@ -400,13 +402,13 @@ console.log(p.slope);
 	    
 	    p.angleMode(p.RADIANS);
 	    p.colorMode(p.RGB);
-	    let lx=15*p.sx*p.slope.slope*Math.cos(p.slope.aspect);
-	    let ly=15*p.sy*p.slope.slope*Math.sin(p.slope.aspect);
+	    let lx=10*p.sx*p.slope.slope*Math.cos(p.slope.aspect);
+	    let ly=10*p.sy*p.slope.slope*Math.sin(p.slope.aspect);
 
 	    //let ll=Math.sqrt(lx*lx+ly*ly);
 	    
 	    p.strokeWeight(3);
-	    p.line( 0, 0, 0 ,lx ,ly ,0 )
+	    p.line( 0, 0, 0 ,lx ,-ly ,0 )
 	    //p.line( lx,ly,0,lx,ly,-slope.slope)
 	    
 	    p.pop()
@@ -425,9 +427,9 @@ console.log(p.slope);
 
 let terrain;
 
-async function showTerrain(pfad,color){
+async function showTerrain(pfad,color,tags){
     if(!terrain)terrain  = new p5(show);
-    await terrain.updateImage(pfad,color)
+    await terrain.updateImage(pfad,color,tags)
     document.getElementById('terrainBackground').setAttribute('style','display:block');
 }
 

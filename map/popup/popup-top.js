@@ -386,7 +386,8 @@ function tops(contentElm,feature,diffs){
     
     let terrainPfad='../data/'+feature.id+'/';
     let color=propagationColor(feature.properties.tags.propagation);
-    minimapElm.addEventListener('click', ()=>{ showTerrain(terrainPfad,color) });
+    //minimapElm.addEventListener('click', async ()=>{ await showTerrain(terrainPfad,color) });
+    minimapElm.addEventListener('click', async ()=>{ await showTerrain(terrainPfad,color,feature.properties.tags) });
 
     contentElm.appendChild(minimapElm);
 
