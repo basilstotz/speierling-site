@@ -149,12 +149,14 @@ function portrait(parentElm,feature, diffs){
 	appendTableRow(tabelle, "Krone:", tags.diameter_crown+' m');
     }
 
-    
+    /*
     if(tags.height) {           
 	appendTableRow(tabelle, "Höhe:", Math.round(tags.height)+' m');
     }
-   
-
+    */
+    let hf='https://openstreetmap.org/node/'+id;
+    appendTableRow(tabelle,'ID:','<a target="_blank" href="'+hf+'">'+id+'</a>');
+    
     /*
     let jetzt=dateNowISO();
     */

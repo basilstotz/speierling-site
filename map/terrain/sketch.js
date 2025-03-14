@@ -153,8 +153,8 @@ var show = (p) => {
 	p.beginShape(p.TRIANGLE_STRIP);
 	p.y=0;
 	for(p.x=0;p.x<p.rows;p.x++){
-            p.vertex(p.x*p.sx,p.y*p.sy,p.getGrid(p.x,p.y)*p.sz);
-            p.vertex(p.x*p.sx,p.y*p.sy,p.d);
+            p.vertex(p.x*p.sx, p.y*p.sy, p.getGrid(p.x,p.y)*p.sz);
+            p.vertex(p.x*p.sx, p.y*p.sy, p.d);
 	}
 	p.endShape();
 	p.fill(204,153,0);
@@ -186,7 +186,7 @@ var show = (p) => {
 
 	p.bb = p.endGeometry();
 	//return bb
-	return p.bb.computeNormals();
+	return p.bb;
     }
 
 /*    
