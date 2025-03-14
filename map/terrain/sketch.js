@@ -60,7 +60,7 @@ function getSlope(data,ncols,x,y){
 	aspect =  Math.atan2( dzdy, dzdx );
 
 	let ans = { ele: H22, slope: slope, aspect: aspect };
-	console.log(ans);
+//console.log(ans);
 	return ans;
 }
 
@@ -217,6 +217,7 @@ var show = (p) => {
 	p.grid= new Float32Array(width*height);     //           Uint16Array(width*height);
 	
 	p.auszug.loadPixels();
+console.log(width,height);
 console.log(p.auszug.pixels)
 	for (let i=0; i<p.grid.length; i++) {
 	    //const ele= (p.auszug.pixels[idx]*256+p.auszug.pixels[idx+1]);
@@ -228,7 +229,7 @@ console.log(p.auszug.pixels)
 	
         for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-p.bottom;
 	//console.log(p.min);
-	console.log(p.grid);
+console.log(p.grid);
 	
 	p.rows=width;
 	p.cols=height;
@@ -279,7 +280,7 @@ console.log(p.auszug.pixels)
 	p.my = Math.round(p.cols/2)
 	p.mz = p.getGrid(p.mx,p.my);
 	p.slope = getSlope(p.grid,p.cols,p.mx,p.my);
-console.log(p.slope);
+//console.log(p.slope);
 	if(p.landschaft)p.freeGeometry(p.landschaft);
 	if(p.box)p.freeGeometry(p.box);
 	p.landschaft = new p5.Geometry(1,1,p.createShape)
