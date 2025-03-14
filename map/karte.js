@@ -4,7 +4,7 @@
 
 let searchItems=[];
 let globalGeo;
-
+let dataDir='../../data/'
 
 function addParent(geojson){
 
@@ -636,7 +636,7 @@ httpGet('Sorbus_domestica_plg.geojson', addGeojsonDistri);
 //httpGet('../data/slope.geojson', addSlopeLayer);
 
 
-httpGet('../data/sorbusdomestica.geojson', addGeojsonLayer);
+httpGet(dataDir+'sorbusdomestica.geojson', addGeojsonLayer);
 
 
 let ziel=0;
