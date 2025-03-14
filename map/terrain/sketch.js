@@ -65,6 +65,45 @@ function getSlope(data,ncols,x,y){
 }
 
 
+class HeightGrid {
+
+    constructor(pixels,width,height){
+	this.width=width;
+	this.height=height;
+	this.data = new Float32Array(width*height);
+	
+	for(let i=0;i<this.data.length;i++){
+	    this.data[i]=PixelToEle(pixels,4*i);
+	}
+
+	/*
+	for(let i=0;i<uint32.length;i++){
+	    this.data[i]= ((uint32[i]>>8)-10000)*0.1;
+	}
+*/
+	console.log(pixels,this.data);
+    }
+    
+    get(x,y){
+	return this.data[y*this.width+x];
+    }
+
+    getMin(){
+	let min=1000000;
+	for(let i=0;i<this.data.length;i++){
+	    let tmp=this.data[i];
+	    if(tmp<min)min=tmp;
+	}
+	return min;
+    }
+
+    subMin(offset=0){
+	let min= this.getMin();
+	for(let i=0;i<this.data.length;i++){
+	    this.data[i]-=min-offset;
+	}
+    }
+}
 
 
 var show = (p) => {
@@ -189,6 +228,28 @@ var show = (p) => {
 	return p.bb;
     }
 
+
+    p.makeGrid = () => {
+	let width=p.auszug.width;
+	let height=p.auszug.height;
+	p.auszug.loadPixels();
+	let pixels= p.auszug.pixels;
+	
+	p.grid= new HeightGrid(pixels,width,height);
+	p.grid.subMin(10);
+	
+	p.rows=width;
+	p.cols=height;
+	p.b=p.sx*p.rows;
+	p.h=p.sy*p.cols;
+	p.d=0;
+    }
+
+
+    p.getGrid = (x,y) => {
+        return p.grid.get(x,y);
+    }
+
 /*    
     p.makeGrid = () => {
 	p.grid=[];
@@ -211,14 +272,15 @@ var show = (p) => {
 	p.h=p.sy*p.cols;
     }
 */
+    
 
   
-        
+ /*       
     p.makeGrid = () => {
 	p.min=10000;
 	let width=p.auszug.width;
 	let height=p.auszug.height;
-	p.grid= new Float32Array(width*height);     //           Uint16Array(width*height);
+	p.grid= new Int32Array(width*height);     //           Uint16Array(width*height);
 	
 	p.auszug.loadPixels();
 console.log(width,height);
@@ -248,7 +310,7 @@ console.log(p.grid);
     p.getGrid = (x,y) => {
         return p.grid[y*p.rows+x];
     }
-
+*/
     
     p.createShape = function(){
 	const b = p.rows * p.sx;
