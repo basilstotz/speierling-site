@@ -71,6 +71,15 @@
    <script src="terrain/sketch.js"></script>
    <link rel="stylesheet" href="terrain/terrain.css"/>
    <script>
+         /*execute a function when someone clicks in the document:*/
+     document.addEventListener('click', function (e) {
+	 //console.log(e);
+	 let c=document.getElementById('terrain')
+         if(e.srcElement!=c){
+	     //e.preventDefault();
+	     stopTerrain();
+         }
+    });  
     function stopTerrain(){
         document.getElementById('terrainBackground').setAttribute('style','display:none');
     }
