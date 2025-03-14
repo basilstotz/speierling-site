@@ -101,7 +101,7 @@ var show = (p) => {
 	//console.log(p.cvs);
 	p.sx=15;
 	p.sy=15;
-	p.sz=15;
+	p.sz=1.5;
 	p.bottom= 10;
 	
 	p.d=0;
@@ -241,7 +241,7 @@ var show = (p) => {
 
 
     p.getGrid = (x,y) => {
-        return p.grid[y*p.rows+x]/10.0;
+        return p.grid[y*p.rows+x];
     }
 
     
@@ -333,8 +333,8 @@ console.log(p.slope);
 	    
 	    p.angleMode(p.RADIANS);
 	    p.colorMode(p.RGB);
-	    let lx=200*p.slope.slope*Math.cos(p.slope.aspect);
-	    let ly=200*p.slope.slope*Math.sin(p.slope.aspect);
+	    let lx=15*p.sx*p.slope.slope*Math.cos(p.slope.aspect);
+	    let ly=15*p.sy*p.slope.slope*Math.sin(p.slope.aspect);
 
 	    //let ll=Math.sqrt(lx*lx+ly*ly);
 	    
