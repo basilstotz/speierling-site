@@ -42,6 +42,14 @@ function portrait(parentElm,feature, diffs){
     tabelle.setAttribute("float","left");
     portraitDiv.appendChild(tabelle);
 
+    // link to osm
+    let coords=feature.geometry.coordinates;
+    let ccx=coords[0];
+    let ccy=coords[1];
+    let hf='https://openstreetmap.org/node/'+id+'#map=16/'+ccy+'/'+ccx;
+    //let hf='https://openstreetmap.org/node/'+id+'?mlon='+ccx+'&mlat='+ccy+'#map=16/'+ccy+'/'+ccx;
+    appendTableRow(tabelle,'ID:','<a target="_blank" href="'+hf+'">'+id+'</a>');
+    
     // coordinates
     let lon = feature.geometry.coordinates[0];
     let lat = feature.geometry.coordinates[1];
@@ -154,8 +162,6 @@ function portrait(parentElm,feature, diffs){
 	appendTableRow(tabelle, "Höhe:", Math.round(tags.height)+' m');
     }
     */
-    let hf='https://openstreetmap.org/node/'+id;
-    appendTableRow(tabelle,'ID:','<a target="_blank" href="'+hf+'">'+id+'</a>');
     
     /*
     let jetzt=dateNowISO();
@@ -203,6 +209,8 @@ function portrait(parentElm,feature, diffs){
 	
 	appendTableRow(tabelle, "Früchte:", tags["speierlingproject:Fruechte"])
     }
+
+
     
 }
 
