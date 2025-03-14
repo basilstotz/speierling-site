@@ -81,7 +81,7 @@ class HeightGrid {
 	    this.data[i]= ((uint32[i]>>8)-10000)*0.1;
 	}
 */
-	console.log(pixels,this.data);
+//	console.log(pixels,this.data);
     }
     
     get(x,y){
@@ -345,8 +345,8 @@ console.log(p.grid);
 	p.mx = Math.round(p.rows/2)
 	p.my = Math.round(p.cols/2)
 	p.mz = p.getGrid(p.mx,p.my);
-	p.slope = getSlope(p.grid,p.cols,p.mx,p.my);
-//console.log(p.slope);
+	p.slope = getSlope(p.grid.data,p.cols,p.mx,p.my);
+console.log(p.slope);
 	if(p.landschaft)p.freeGeometry(p.landschaft);
 	if(p.box)p.freeGeometry(p.box);
 	p.landschaft = new p5.Geometry(1,1,p.createShape)
