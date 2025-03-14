@@ -78,8 +78,12 @@ var show = (p) => {
     }
     
     p.updateImage = async function(pfad,color,radius=3){
-	p.auszug = await p.loadImagePromise(pfad+'dem-512.png');
-	p.texte = await p.loadImagePromise(pfad+'esri-512.png');
+	try {
+	    p.auszug = await p.loadImagePromise(pfad+'dem-512.png');
+	    p.texte = await p.loadImagePromise(pfad+'esri-512.png');
+	} catch {
+	    console.log('error reading images');
+	}
 	p.treeColor=color;
 	p.treeRadius=radius;
 	p.makeModels()
