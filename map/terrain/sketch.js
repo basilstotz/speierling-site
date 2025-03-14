@@ -217,7 +217,7 @@ var show = (p) => {
 	p.grid= new Float32Array(width*height);     //           Uint16Array(width*height);
 	
 	p.auszug.loadPixels();
-//console.log(p.auszug.pixels)
+console.log(p.auszug.pixels)
 	for (let i=0; i<p.grid.length; i++) {
 	    //const ele= (p.auszug.pixels[idx]*256+p.auszug.pixels[idx+1]);
 	    const ele= PixelToEle(p.auszug.pixels,4*i);  //Uintarry ?????????????????
@@ -228,7 +228,7 @@ var show = (p) => {
 	
         for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-p.bottom;
 	//console.log(p.min);
-	//console.log(p.grid);
+	console.log(p.grid);
 	
 	p.rows=width;
 	p.cols=height;
