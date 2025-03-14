@@ -85,8 +85,45 @@ class HeightGrid {
     }
     
     get(x,y){
-	return this.data[y*this.width+x];
+	return this.data[Math.round(y)*this.width+Math.round(x)];
     }
+
+
+    getBilinear(row, col) {
+	var avg = function(v1, v2, f) {
+            return v1 + (v2 - v1) * f;
+        },
+            rowLow = Math.floor(row),
+	    rowHi = rowLow + 1,
+	    rowFrac = row - rowLow,
+	    colLow = Math.floor(col),
+	    colHi = colLow + 1,
+	    colFrac = col - colLow,
+	    v00 = this.get(rowLow, colLow),
+	    v10 = this.get(rowLow, colHi),
+	    v11 = this.get(rowHi, colHi),
+	    v01 = this.get(rowHi, colLow),
+	    v1 = avg(v00, v10, colFrac),
+	    v2 = avg(v01, v11, colFrac);
+
+	    // console.log('row = ' + row);
+	    // console.log('col = ' + col);
+	    // console.log('rowLow = ' + rowLow);
+	    // console.log('rowHi = ' + rowHi);
+	    // console.log('rowFrac = ' + rowFrac);
+	    // console.log('colLow = ' + colLow);
+	    // console.log('colHi = ' + colHi);
+	    // console.log('colFrac = ' + colFrac);
+	    // console.log('v00 = ' + v00);
+	    // console.log('v10 = ' + v10);
+	    // console.log('v11 = ' + v11);
+	    // console.log('v01 = ' + v01);
+	    // console.log('v1 = ' + v1);
+	    // console.log('v2 = ' + v2);
+
+	return avg(v1, v2, rowFrac);
+};
+
 
     getMin(){
 	let min=1000000;
@@ -102,6 +139,7 @@ class HeightGrid {
 	for(let i=0;i<this.data.length;i++){
 	    this.data[i]-=min-offset;
 	}
+	return min;
     }
 }
 
@@ -238,7 +276,7 @@ var show = (p) => {
 	let pixels= p.auszug.pixels;
 	
 	p.grid= new HeightGrid(pixels,width,height);
-	p.grid.subMin(10);
+	p.min= p.grid.subMin(10);
 	
 	p.rows=width;
 	p.cols=height;
@@ -383,7 +421,10 @@ console.log(p.grid);
 	    //p.colorMode(p.RGB);
 	    p.stroke(p.treeColor)
 	    //p.fill(p.treeColor)
-	    p.translate(p.mx*p.sx,p.my*p.sy,p.mz*p.sz);
+	    let mmx=p.cols/2;
+	    let mmy=p.rows/2;
+	    p.translate(mmx*p.sx,mmy*p.sy,p.grid.getBilinear(mmx,mmy)*p.sz);
+	    //p.translate(p.mx*p.sx, p.my*p.sy, p.mz*p.sz);
 	    p.sphere(p.treeRadius*1.2);
 	    //slope
 	    p.colorMode(p.HSB);
