@@ -1,0 +1,11 @@
+ <script type="module">                                                                         
+     // https://stackoverflow.com/questions/67246229/mix-commonjs-and-es6-modules-in-same-project 
+     async function loadEsModules() {                                                             
+         const module = await import('./terrain/sketch.mjs');                                     
+         window.showTerrain = module.showTerrain;                                                 
+         window.terrainSetZoom = module.terrainSetZoom;                                           
+         window.terrainSetPan = module.terrainSetPan;                                             
+         window.terrainSetSize = module.terrainSetSize;                                           
+     }                                                                                            
+     await loadEsModules();                                                                       
+   </script> 

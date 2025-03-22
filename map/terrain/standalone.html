@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      header {
+        padding: 20px;
+      }
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+    
+    </style>
+    <meta charset="utf-8" />
+
+    <script src="p5/p5.min.js"></script>
+    <script src="bundle.js"></script>
+    <script>
+      //let RasterLayer;
+      //let Map3D;
+    </script>
+
+  </head>
+
+  <body>
+<div id="spinner" class="loader centered" style="display:none"></div>
+    <!--
+    <script type="module">
+     // https://stackoverflow.com/questions/67246229/mix-commonjs-and-es6-modules-in-same-project
+     async function loadEsModules() {
+         const pkg = await import('./Map3D.mjs');
+	 window.Map3D=pkg.Map3D
+	 window.RasterLayer=pkg.RasterLayer;
+	 /*
+         p5.prototype.createMap3D = function(pInst){
+	     const pMap3D = new pkg.Map3D();
+	     pMap3D.pInst = pInst;
+	     return pMap3D;
+	 }
+	 p5.prototype.createRasterLayer = function(pInst){
+	     const pRasterLayer = new pkg.RasterLayer();
+	     pRasterLayer.pInst = pInst;
+	     return pRasterLayer;
+	 }
+	 */
+     }
+     await loadEsModules();
+   </script> 
+-->
+
+    <script>
+  
+      function startSpinner(){
+	  console.log('start');
+	  document.getElementById('spinner').setAttribute('style','display:block;z-index:5')
+      }
+      
+      function stopSpinner(){
+	  console.log('stop');
+	  document.getElementById('spinner').setAttribute('style','display:none')
+      }
+
+      function updateMap(){
+	  map.setZoom(Number(zoom.value()));
+	  let s=Number(size.value());
+	  map.setSize(s,s);
+	  map.update();
+      }
+
+      let map;
+      //let ready=false;
+      let button;
+      let zoom;
+      let size;
+      let sun;
+
+      function setup() {
+
+	  createCanvas(windowWidth, windowHeight, WEBGL);
+	  //debugMode();
+
+	  //controls
+	  button=createButton('update');
+	  button.position(240,20);
+	  button.mousePressed(updateMap)
+
+	  zoom=createSelect();
+	  zoom.position(20,20);
+	  zoom.option('12',12);
+	  zoom.option('13',13);
+	  zoom.option('14',14);
+	  zoom.option('15',15);
+	  zoom.option('16',16);
+	  zoom.selected('16');
+
+	  size=createSelect();
+	  size.position(120,20);
+	  size.option('256',256);
+	  size.option('512',512);
+	  size.option('768',768);
+	  size.option('1024',1024);
+	  //size.option('2048',2048);	  
+	  size.selected('512');
+
+          sun=createSlider(0,Math.PI*2,0,0);
+	  sun.position(320,20);
+
+	  //map
+	  map = Map3D.createMap3D(this);
+	  map.setMap(47.4926694, 7.6414257,12,512,512);
+	  //map.setMap(47.716129, 8.6102,12,512,512);
+	  map.setTerrainTemplate('../../data/maps/tiles/dem/{z}/{x}/{y}.png');
+	  map.setTextureTemplate('../../data/maps/tiles/esri/{z}/{x}/{y}.jpeg');
+
+	  map.events.on('updatestart',startSpinner);
+	  map.events.on('updateend',stopSpinner);
+	  
+	  updateMap();
+	  
+ 
+     }
+
+      function draw() {
+	  background(255);
+	  orbitControl();
+	  if(map){
+	      let phi=sun.value();
+	      let lightX=Math.sin(phi)
+              let lightY=-1*Math.sin(phi)
+              let lightZ=Math.cos(phi)  
+	      map.setLight(lightX,-1,lightZ);
+	      map.render();
+	  }
+      }
+
+    </script>
+  </body>
+</html>

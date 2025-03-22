@@ -1,0 +1,131 @@
+#!/usr/bin/env node
+
+//import { SphericalMercator } from '@mapbox/sphericalmercator';
+//import * as tilebelt from '@mapbox/tilebelt';
+//import * as utils from '../../../data/data-factory/modules/map-utils.mjs'
+//                        ../../../data/data-factory/modules/
+//    p.getSlope = (data,ncols,x,y) =>{
+
+
+export function PixelToEle(pixels, idx){
+	//idx*=4;
+	let red = pixels[idx+0];     
+	let green = pixels[idx+1];     
+	let blue = pixels[idx+2];     
+	return ( (red * 256 * 256 + green * 256 + blue) * 0.1) - 10000 
+	//return ( (red<<16 + green<<8 + blue) * 0.1) - 10000 
+}
+
+
+export function getSlope(data,ncols,x,y){
+    /* on image data
+    function H(idx){
+        const i=4*idx:
+        return (data[i+0]*256+data[i+1])/10.0
+    }
+    */
+
+	function H(idx){
+            return data[idx]
+	}
+    
+	let slope;
+	let aspect;
+
+	let zFactor=1.0/90.0
+
+	let r=ncols;
+	let i=y*ncols+x
+
+	let H11 = H(i-r-1);
+	let H12 = H(i-r);
+	let H13 = H(i-r+1);
+	let H21 = H(i-1)
+	let H22 = H(i);
+	let H23 = H(i+1);
+	let H31 = H(i+r-1);
+	let H32 = H(i+r);
+	let H33 = H(i+r+1);
+
+	let dzdy = ( H11 + 2*H12 + H13 - H31 - 2*H32 - H33 ) / 4.0
+	let dzdx = ( H11 + 2*H21 + H31 - H13 - 2*H23 - H33 ) / 4.0
+	 //console.log(N+' '+S+' '+E+' '+W);
+
+	let dx=1;
+	let dy=1;
+
+	dzdx= dzdx/dx;
+	dzdy= dzdy/dy;
+
+	let d2=zFactor*Math.sqrt( dzdx*dzdx + dzdy*dzdy)
+
+	//if(d2>0)console.log(d2+' '+dzdy+' '+dzdx);
+
+	//slope=Math.atan(d2);
+	slope=d2;
+	aspect =  Math.atan2( dzdy, dzdx );
+
+	let ans = { ele: H22, slope: slope, aspect: aspect };
+//console.log(ans);
+	return ans;
+}
+
+
+export class HeightGrid {
+
+    constructor(pixels,width,height){
+	this.width=width;
+	this.height=height;
+	this.data = new Float32Array(width*height);
+	
+	for(let i=0;i<this.data.length;i++){
+	    this.data[i]=this.pixelToEle(pixels,4*i);
+	}
+    }
+
+    pixelToEle(pixels, idx){
+	//idx*=4;
+	let red = pixels[idx+0];     
+	let green = pixels[idx+1];     
+	let blue = pixels[idx+2];     
+	return ( (red * 256 * 256 + green * 256 + blue) * 0.1) - 10000 
+	//return ( (red<<16 + green<<8 + blue) * 0.1) - 10000 
+    }
+
+    
+    get(x,y){
+	return this.data[Math.round(y)*this.width+Math.round(x)];
+    }
+
+
+    getBilinear(x, y) {
+	var avg = function(v1, v2, f) {
+            return v1 + (v2 - v1) * f;
+        },
+            xLow = Math.floor(x),
+	    xHi = xLow + 1,
+	    xFrac = x - xLow,
+	    yLow = Math.floor(y),
+	    yHi = yLow + 1,
+	    yFrac = y - yLow,
+	    v00 = this.get(xLow, yLow),
+	    v10 = this.get(xLow, yHi),
+	    v11 = this.get(xHi, yHi),
+	    v01 = this.get(xHi, yLow),
+	    v1 = avg(v00, v10, yFrac),
+	    v2 = avg(v01, v11, yFrac);
+	
+	return avg(v1, v2, xFrac);
+};
+
+
+    getMin(){
+	let min=1000000;
+	for(let i=0;i<this.data.length;i++){
+	    let tmp=this.data[i];
+	    if(tmp<min)min=tmp;
+	}
+	return min;
+    }
+
+}

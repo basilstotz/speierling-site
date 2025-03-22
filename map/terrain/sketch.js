@@ -1,148 +1,3 @@
-//    p.getSlope = (data,ncols,x,y) =>{
-
-
-function PixelToEle(pixels, idx){
-	//idx*=4;
-	let red = pixels[idx+0];     
-	let green = pixels[idx+1];     
-	let blue = pixels[idx+2];     
-	return ( (red * 256 * 256 + green * 256 + blue) * 0.1) - 10000 
-	//return ( (red<<16 + green<<8 + blue) * 0.1) - 10000 
-}
-
-
-function getSlope(data,ncols,x,y){
-    /* on image data
-    function H(idx){
-        const i=4*idx:
-        return (data[i+0]*256+data[i+1])/10.0
-    }
-    */
-
-	function H(idx){
-            return data[idx]
-	}
-    
-	let slope;
-	let aspect;
-
-	let zFactor=1.0/90.0
-
-	let r=ncols;
-	let i=y*ncols+x
-
-	let H11 = H(i-r-1);
-	let H12 = H(i-r);
-	let H13 = H(i-r+1);
-	let H21 = H(i-1)
-	let H22 = H(i);
-	let H23 = H(i+1);
-	let H31 = H(i+r-1);
-	let H32 = H(i+r);
-	let H33 = H(i+r+1);
-
-	let dzdy = ( H11 + 2*H12 + H13 - H31 - 2*H32 - H33 ) / 4.0
-	let dzdx = ( H11 + 2*H21 + H31 - H13 - 2*H23 - H33 ) / 4.0
-	 //console.log(N+' '+S+' '+E+' '+W);
-
-	let dx=1;
-	let dy=1;
-
-	dzdx= dzdx/dx;
-	dzdy= dzdy/dy;
-
-	let d2=zFactor*Math.sqrt( dzdx*dzdx + dzdy*dzdy)
-
-	//if(d2>0)console.log(d2+' '+dzdy+' '+dzdx);
-
-	//slope=Math.atan(d2);
-	slope=d2;
-	aspect =  Math.atan2( dzdy, dzdx );
-
-	let ans = { ele: H22, slope: slope, aspect: aspect };
-//console.log(ans);
-	return ans;
-}
-
-
-class HeightGrid {
-
-    constructor(pixels,width,height){
-	this.width=width;
-	this.height=height;
-	this.data = new Float32Array(width*height);
-	
-	for(let i=0;i<this.data.length;i++){
-	    this.data[i]=PixelToEle(pixels,4*i);
-	}
-
-	/*
-	for(let i=0;i<uint32.length;i++){
-	    this.data[i]= ((uint32[i]>>8)-10000)*0.1;
-	}
-*/
-//	console.log(pixels,this.data);
-    }
-    
-    get(x,y){
-	return this.data[Math.round(y)*this.width+Math.round(x)];
-    }
-
-
-    getBilinear(row, col) {
-	var avg = function(v1, v2, f) {
-            return v1 + (v2 - v1) * f;
-        },
-            rowLow = Math.floor(row),
-	    rowHi = rowLow + 1,
-	    rowFrac = row - rowLow,
-	    colLow = Math.floor(col),
-	    colHi = colLow + 1,
-	    colFrac = col - colLow,
-	    v00 = this.get(rowLow, colLow),
-	    v10 = this.get(rowLow, colHi),
-	    v11 = this.get(rowHi, colHi),
-	    v01 = this.get(rowHi, colLow),
-	    v1 = avg(v00, v10, colFrac),
-	    v2 = avg(v01, v11, colFrac);
-
-	    // console.log('row = ' + row);
-	    // console.log('col = ' + col);
-	    // console.log('rowLow = ' + rowLow);
-	    // console.log('rowHi = ' + rowHi);
-	    // console.log('rowFrac = ' + rowFrac);
-	    // console.log('colLow = ' + colLow);
-	    // console.log('colHi = ' + colHi);
-	    // console.log('colFrac = ' + colFrac);
-	    // console.log('v00 = ' + v00);
-	    // console.log('v10 = ' + v10);
-	    // console.log('v11 = ' + v11);
-	    // console.log('v01 = ' + v01);
-	    // console.log('v1 = ' + v1);
-	    // console.log('v2 = ' + v2);
-
-	return avg(v1, v2, rowFrac);
-};
-
-
-    getMin(){
-	let min=1000000;
-	for(let i=0;i<this.data.length;i++){
-	    let tmp=this.data[i];
-	    if(tmp<min)min=tmp;
-	}
-	return min;
-    }
-
-    subMin(offset=0){
-	let min= this.getMin();
-	for(let i=0;i<this.data.length;i++){
-	    this.data[i]-=min-offset;
-	}
-	return min;
-    }
-}
-
 
 var show = (p) => {
 
@@ -154,17 +9,9 @@ var show = (p) => {
 	})
     }
     
-    p.updateImage = async function(pfad,color,tags){
-	try {
-	    p.auszug = await p.loadImagePromise(pfad+'dem-512.png');
-	    p.texte = await p.loadImagePromise(pfad+'esri-512.png');
-	} catch {
-	    console.log('error reading images');
-	}
-	p.treeColor=color;
-	p.treeRadius=3;
-	p.slope = { ele: tags.height, slope: tags.slope, aspect: tags.aspect }
-	console.log(tags);
+    p.updateImage = async function(pfad){
+	p.auszug = await p.loadImagePromise(pfad+'dem-512.png');
+	p.texte = await p.loadImagePromise(pfad+'esri-512.png');
 	p.makeModels()
 	p.cam.camera(0,-400,800,0,-100,0);
     }
@@ -185,10 +32,10 @@ var show = (p) => {
 	p.sx=15;
 	p.sy=15;
 	p.sz=1.5;
-	p.bottom= 10;
 	
 	p.d=0;
 
+	p.min=10000;
 	//p.size=1024;
         //p.auszug=p.createGraphics(p.size,p.size);
 	//p.debugMode();
@@ -232,8 +79,8 @@ var show = (p) => {
 	p.beginShape(p.TRIANGLE_STRIP);
 	p.y=0;
 	for(p.x=0;p.x<p.rows;p.x++){
-            p.vertex(p.x*p.sx, p.y*p.sy, p.getGrid(p.x,p.y)*p.sz);
-            p.vertex(p.x*p.sx, p.y*p.sy, p.d);
+            p.vertex(p.x*p.sx,p.y*p.sy,p.getGrid(p.x,p.y)*p.sz);
+            p.vertex(p.x*p.sx,p.y*p.sy,p.d);
 	}
 	p.endShape();
 	p.fill(204,153,0);
@@ -265,29 +112,7 @@ var show = (p) => {
 
 	p.bb = p.endGeometry();
 	//return bb
-	return p.bb;
-    }
-
-
-    p.makeGrid = () => {
-	let width=p.auszug.width;
-	let height=p.auszug.height;
-	p.auszug.loadPixels();
-	let pixels= p.auszug.pixels;
-	
-	p.grid= new HeightGrid(pixels,width,height);
-	p.min= p.grid.subMin(10);
-	
-	p.rows=width;
-	p.cols=height;
-	p.b=p.sx*p.rows;
-	p.h=p.sy*p.cols;
-	p.d=0;
-    }
-
-
-    p.getGrid = (x,y) => {
-        return p.grid.get(x,y);
+	return p.bb.computeNormals();
     }
 
 /*    
@@ -312,30 +137,19 @@ var show = (p) => {
 	p.h=p.sy*p.cols;
     }
 */
-    
-
-  
- /*       
     p.makeGrid = () => {
-	p.min=10000;
 	let width=p.auszug.width;
 	let height=p.auszug.height;
-	p.grid= new Int32Array(width*height);     //           Uint16Array(width*height);
-	
+	p.grid= new Uint16Array(width*height);
 	p.auszug.loadPixels();
-console.log(width,height);
-console.log(p.auszug.pixels)
-	for (let i=0; i<p.grid.length; i++) {
-	    //const ele= (p.auszug.pixels[idx]*256+p.auszug.pixels[idx+1]);
-	    const ele= PixelToEle(p.auszug.pixels,4*i);  //Uintarry ?????????????????
+	for (let i=0; i<p.grid.length; i+=1) {
+	    const idx=4*i;
+	    const ele= (p.auszug.pixels[idx]*256+p.auszug.pixels[idx+1]);
 	    if(ele<p.min)p.min=ele;
 	    p.grid[i]=ele;
 	}
-//console.log(p.grid)
-	
-        for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-p.bottom;
-	//console.log(p.min);
-console.log(p.grid);
+
+        for(let i=0;i<p.grid.length;i++)p.grid[i]-=p.min-100;
 	
 	p.rows=width;
 	p.cols=height;
@@ -343,16 +157,36 @@ console.log(p.grid);
 	p.h=p.sy*p.cols;
 	//console.log(p.grid);
 	p.d=0;
-	//console.log(p.d);
+	console.log(p.d);
     }
 
 
     p.getGrid = (x,y) => {
-        return p.grid[y*p.rows+x];
+        return p.grid[y*p.rows+x]/10.0;
     }
-*/
-    
+
+    /*
     p.createShape = function(){
+	for(p.y=0;p.y<p.cols;p.y++){
+            for(p.x=0;p.x<p.rows;p.x++){
+		p.vx = p.x*p.sx;
+		p.vy = p.y*p.sy;
+		p.vz = p.sz * p.grid[p.y][p.x];
+		this.vertices.push(p.createVector(p.vx,p.vy,p.vz));
+		this.uvs.push(p.vx/p.b);
+		this.uvs.push(p.vy/p.h);
+		if(p.x>0 && p.y>0){
+		    p.idx=this.vertices.length-1;
+                    this.faces.push( [ p.idx-p.rows-1, p.idx-1, p.idx-p.rows ]);
+                    this.faces.push( [ p.idx-p.rows  , p.idx-1, p.idx        ]);
+		}
+            }
+	}
+	this.computeNormals();
+    }
+    */
+    
+    p.createShape2 = function(){
 	const b = p.rows * p.sx;
 	const h = p.cols * p.sy;
 	for(let y=0;y<p.cols;y++){
@@ -381,15 +215,9 @@ console.log(p.grid);
     
     p.makeModels = () => {
 	p.makeGrid();
-	
-	p.mx = Math.round(p.rows/2)
-	p.my = Math.round(p.cols/2)
-	p.mz = p.getGrid(p.mx,p.my);
-	
-//console.log(p.slope);
 	if(p.landschaft)p.freeGeometry(p.landschaft);
 	if(p.box)p.freeGeometry(p.box);
-	p.landschaft = new p5.Geometry(1,1,p.createShape)
+	p.landschaft = new p5.Geometry(1,1,p.createShape2)
 	//p.landschaft.saveObj();
 	p.box = p.makeBox();
     }
@@ -397,7 +225,7 @@ console.log(p.grid);
     
     p.draw = () => {
 	p.background(0);
-	p.ambientLight(96);
+	p.ambientLight(64);
 	p.directionalLight(255, 255, 255, -1, -1,1);
 	//normalMaterial();
 	p.fill(0,0,255);
@@ -415,46 +243,15 @@ console.log(p.grid);
 	p.stroke(255);
 	if( p.landschaft && p.box ){
             //tree
+	    let mx=Math.round(p.rows/2)
+	    let my=Math.round(p.cols/2)
+	    let mz=p.getGrid(mx,my);
 	    p.push();
-	    //tree
-	    //let color = p.color(255,0,0);
-	    //p.colorMode(p.RGB);
-	    p.stroke(p.treeColor)
-	    //p.fill(p.treeColor)
-	    let mmx=p.cols/2;
-	    let mmy=p.rows/2;
-	    p.translate(mmx*p.sx,mmy*p.sy,p.grid.getBilinear(mmx,mmy)*p.sz);
-	    //p.translate(p.mx*p.sx, p.my*p.sy, p.mz*p.sz);
-	    p.sphere(p.treeRadius*1.2);
-	    //slope
-	    p.colorMode(p.HSB);
-	    p.angleMode(p.DEGREES);
-	    let phi = p.slope.aspect*(180/Math.PI)+90;
-	    if(phi<0)phi=phi+360;
-	    if(phi>360)phi=phi-360;
-
-	    phi= Math.round(phi/45)*45;
-	    // süden: rot; osten: lila; norden: blau; westen: grün
-	    //if(p.frameCount==100)console.log(phi,p.colorMode());
-	    //let phi= Math.round((p.slope.aspect-Math.PI/2)/8)*(Math.PI/8);
-	    let c = p.color(phi,100,100)
-	    p.stroke(phi,85,90);
-	    //p.fill(c)
-	    
-	    p.angleMode(p.RADIANS);
-	    p.colorMode(p.RGB);
-	    let lx=10*p.sx*p.slope.slope*Math.cos(p.slope.aspect);
-	    let ly=10*p.sy*p.slope.slope*Math.sin(p.slope.aspect);
-
-	    //let ll=Math.sqrt(lx*lx+ly*ly);
-	    
-	    p.strokeWeight(3);
-	    p.line( 0, 0, 0 ,lx ,-ly ,0 )
-	    //p.line( lx,ly,0,lx,ly,-slope.slope)
-	    
+	    p.emissiveMaterial(0,255,0)
+	    p.translate(mx*p.sx,my*p.sy,mz*p.sz);
+	    p.sphere(5);
 	    p.pop()
             //terrain
-	    //p.stroke(255)
 	    p.texture(p.texte)
 	    p.model(p.landschaft)
 	    p.fill(0,255,0);
@@ -468,9 +265,9 @@ console.log(p.grid);
 
 let terrain;
 
-async function showTerrain(pfad,color,tags){
+async function showTerrain(pfad){
     if(!terrain)terrain  = new p5(show);
-    await terrain.updateImage(pfad,color,tags)
-    document.getElementById('terrainBackground').setAttribute('style','display:block');
+    await terrain.updateImage(pfad)
+    document.getElementById('container').setAttribute('style','display:block');
 }
 

@@ -1,0 +1,63 @@
+{
+    osm: {
+	template: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+	name: 'osm',
+	ext: 'png'
+    },
+    esri: {
+	template: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+	name: 'esri',
+	ext: 'jpeg'
+    },
+    swisslaub: {
+	template: 'https://wmts.geo.admin.ch/1.0.0/ch.bafu.landesforstinventar-waldmischungsgrad/default/current/3857/{z}/{x}/{y}.png',
+	name: 'laub',
+	ext: 'png'
+    },
+    swisswald: {
+	template: 'https://wmts.geo.admin.ch/1.0.0/ch.bafu.ren-wald/default/current/3857/{z}/{x}/{y}.png',
+	name: 'wald',
+	ext: 'png'
+    },
+    swissraum: {
+	template: 'https://wmts.geo.admin.ch/1.0.0/ch.bafu.lebensraumkarte-schweiz/default/current/3857/{z}/{x}/{y}.png',
+	name: 'raum',
+	ext: 'png'
+    },
+    swisshoehe: {
+	template: 'https://wmts.geo.admin.ch/1.0.0/ch.bafu.landesforstinventar-vegetationshoehenmodell/default/current/3857/{z}/{x}/{y}.png',
+	name: 'hoehe',
+	ext: 'png',
+	palette: [
+	    { color: 0xFFFFFF, value: 0.0, name: 'White' },
+	    { color: 0xFFFEB3, value: 1.0, name: 'Creme' },
+	    { color: 0xFFFE70, value: 2.0, name: 'Pastel yellow' },
+	    { color: 0xEBFB4C, value: 3.0, name: 'Banana yellow' },
+	    { color: 0x96F649, value: 5.0, name: 'Kiwi green' },
+	    { color: 0x00EC45, value: 15.0, name: 'Bright light green' },
+	    { color: 0x00CB41, value: 20.0, name: 'Green' },
+	    { color: 0x00A08D, value: 30.0, name: 'Blue/green' },
+	    { color: 0x006A5D, value: 40.0, name: 'Blue green' }
+	];
+
+    },
+    swissslope: {
+	template: 'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.hangneigung-ueber_30/default/current/3857/{z}/{x}/{y}.png',
+	name: 'slope',
+	ext: 'png'
+    },
+    swisshang: {
+	template: 'https://wmts.geo.admin.ch/1.0.0/ch.blw.hang_steillagen/default/current/3857/{z}/{x}/{y}.png',
+	name: 'hang',
+	ext: 'png',
+	palette: [
+	    { color: 0xFFFFFF, value: 0.0, name: 'White' },
+	    { color: 0xFFCACC, value: 18.0, name: 'Light rose' },
+	    { color: 0xDD6167, value: 35.0, name: 'Salmon pink' },
+	    { color: 0xA82B34, value: 50.0, name: 'Dull red' }
+	];
+    }
+}
+
+// ch.bafu.waldreservate
+// ch.swisstopo.swisstlm3d-wald
