@@ -512,7 +512,7 @@ function addGeojsonLayer(responseText){
     
     treeLayer=L.geoJSON(geojsonLayer, {
         //style: style,
-        //filter: filter,
+        filter: function(feature,layer){return feature.properties.tags.species=="Sorbus domestica"},
         onEachFeature: onEachFeature,
         pointToLayer: pointToLayer
     });
