@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projekt Speierling</title>
+  <!---
+  <link rel="stylesheet" href="styles.css">
+  --->
+
+<link rel="stylesheet" href="css/tabulator.css"> 
+  <link rel="stylesheet" href="css/raleway.css">
+  <link rel="stylesheet" href="index.css"> 
+
+  <script src="js/Tabulator.js"></script>
+
+  <script>
+    function getDestSuffix(){
+        let pathName=window.location.pathname;
+        let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
+        if(fileName=='')fileName='index.html';
+
+        let destSuffix='.html';
+        if(fileName.split('_')[1])destSuffix='_'+fileName.split('_')[1];
+        return destSuffix
+    }
+
+    var destSuffix=getDestSuffix();
+    var devMode=(destSuffix!='.html');
+
+    function toHome(){
+	document.getElementById("home").href = window.location.href.replace('/project','');
+   }
+  </script>
+
+     
+  <script>
+
+let text=`<div style="background:#eeeeee;color:black;padding:40px">
+
+<h3>Speierling</h3>
+
+<p>Der Speierling (Sorbus domestica oder Cormus domestica) ist ein seltener und lichtbedürftiger Baum. Unter dem Schatten von grossen Bäumen kann sich der Speierling nicht entwickeln. Wenn er im Wald gepflanzt und vor konkurrenzierenden Bäumen nicht geschützt wird, bleiben für ihn nur wenige Standorte übrig. Diese müssen gut besonnt sein, was eigentlich nur bei Felsbändern und steilen Waldgebieten möglch ist.</p>
+
+<p>Der Speierling ist eine südliche Art. Er kommt deshalb mit der zunehmenden Trockenheit, die sich im Rahmen des Klimawandels ergibt, gut zurecht.</p>
+
+<p>Seit den 90er Jahren sind viele Speierlinge gepflanzt worden. Ihre genetischen Herkünfte sind zumeist jedoch nicht präzise erfasst. Deshalb liegt bei diesem Projekt der Fokus bei älteren «einheimischen» Speierlingen.</p>
+
+<h3>Projektziele</h3>
+
+<!--- <p>Folgende Tätigkeiten sind ausgeführt worden oder sind in Bearbeitung:</p> --->
+
+<ul>
+
+<li>Erstellung und Unterhalt einer Datanbank aller bekannten Speierlinge im Jurabogen. Im Moment sind knapp 2000 Speierlinge enthalten. Von diesen Speierlingen wurden etwa 300 Speierlinge als "ürsprünglich", das heisst als "genetisch Wertvoll" identifiziert.</li>
+
+<li>Förderung durch Freistellen; d.h. benachbarte Bäume werden entfernt, damit diese den lichbedürftigen Speierling nicht beschatten, konkurrenzieren und so zum Absterben bringen.</li>
+
+<li>Vermehrung mittels Propfung und durch Samen; Auspflanzung an mehreren geeigneten Orten als Gen-Erhaltungs-Plantagen.</li>
+
+<li>Beobachtung und Pflege der neu gepflanzten Bäume; Säubern der Baumscheiben z.B. durch das Entfernen von Brombeergestrüpp.</li>
+
+<li>Monitoring; Regelmässige Messungen des Wachstums aller registrierten Speierlinge.</li> 
+
+<li>Citizen-Science; der Einbezug von weiterer Personen im Sinne eines Citizen-Science-Projekts erlaubt uns das Projektgebiet auf weitere Regionen auszudehnen.</li>
+</ul>
+
+
+<h3>Aktueller Stand</h3>
+<p>Im Kanton BL sind inzwischen alle «alten» Speeierlinge registriert worden. Ihre Genetik ist mittels Pfropfung und Samenernte in verschiedenen kleinen «Gen-Erhaltungs-Plantagen» gesichert.</p>
+
+<p>Inzwischen ist auch die Inventur von weiteren Kantonen (AG, SO, ZH) abgeschlossen worden. «Alte» Speierlinge gibt es da auch im Kanton AG. Auch hier ist eine Vermehrung zur Generhaltung in Arbeit (wie im Kanton BL; siehe oben). Die entsprechenden Ergebnisse finden sich zeitnah auf dieser Webseite.</p>
+
+<p>Aktuell ist das Inventar vom Kanton SH in Bearbeitung. Später folgen die weiteren ostschweizer Kantone und anschliessend ist die Westschweiz an der Reihe.</p>
+
+<p>Unsere Webeite enthält eine Vielzahl von Informationen; nicht nur die Karte mit z.T. detaillierten Angaben zu einzelnen Speierlingen samt einer Bildstrecke. Eine Tabelle bietet raschen Zugang zu Informationen über einzelne Gemeinden und schliesslich finden Sie auch grafisch aufbereitete Statistiken.</p>
+
+<h3>Unterstützer</h3>
+
+<p>Dieses Speierlings-Projekt wird von verschiedenen Organisationen und Institutionen unterstützt (Swisslos, Walder-Bachmann-Stiftung, Stiftung Spitzenflühli, Stiftung Salzgut und Stiftung zur Förderung der Pflanzenkenntnis).</p>
+
+<p>Basel, im Dezember 2025</p>
+</div>
+`;
+    
+    let tabulator;
+    let container;
+    
+     function onBody(){
+	 toHome();
+	 
+	 let parent = document.getElementById('inhalt');
+         tabulator= new Tabulator(parent);
+
+	 container = document.createElement('div');
+	 container.innerHTML=text;
+
+	 tabulator.addTab(container,"Angaben zum Projekt")
+         tabulator.openFirstTab();
+	 
+	 
+     }    
+  </script>
+
+  
+  <style>     
+    body {
+	font-family:arial;
+	color:white;
+	background-color: rgba(255,255,255,0);
+	
+    }
+    h1 {
+	text-align:center
+    }
+    #tabelle {
+	background-color: rgba(255,255,255,0);
+	margin:auto;
+    }
+    #home {
+	z-index:5;
+	opacity:0.7;
+	position:absolute;
+	top:20px;
+	left:20px;
+    }
+   .bgimg {
+       background-image: url('images/background.jpg');
+   /*  min-height: 100%;
+     background-position: center;
+     background-size: cover;*/
+   }
+  </style>
+</head>
+
+<body class="bgimg" onload="onBody()">
+  <a id="home"><img style="width:30px" src="images/home.png"></a>
+  <h1>Projekt Speierling</h1>
+  <!--<span style="color:lightgrey;font-size:14px" id="disp"></span>--> 
+  <!---<div id="inhalt"></div> -->
+  <div id="inhalt" style="margin:auto;max-width:708px"></div>
+</body>
+
+
+</html
+
+  
+

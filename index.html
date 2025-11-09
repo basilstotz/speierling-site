@@ -64,6 +64,9 @@ function httpGet(theUrl, callback)
    function toTabular(){
        document.getElementById("tabular").href = "tabelle/index"+destSuffix;
    }
+   function toProject(){
+       document.getElementById("project").href = "project/index"+destSuffix;
+   }
 
 </script>
 
@@ -88,6 +91,7 @@ langfristig erhalten bleibt</p>
     <p class="w3-xlarge w3-center" id="statsB" style="margin-top:14px;margin-bottom:32px"><br/><br/></p>
 
     <span class="w3-center w3-animate-top">
+      <a id="project"><button style="width:120px"><b>Projekt</b></button></a>
       <a id="tabular"><button style="width:120px"><b>Tabelle</b></button></a>
       <a id="link"><button style="width:120px"><b>Karte</b></button></a>
       <a id="linker"><button style="width:120px"><b>Statistik</b></button></a>
@@ -131,6 +135,7 @@ langfristig erhalten bleibt</p>
   toMap();
   toStats();
   toTabular();
+  toProject();
 </script>
 
 <script>
