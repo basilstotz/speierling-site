@@ -56,6 +56,11 @@ var show = (p) => {
 	    return [ px1[0]-px0[0], px1[1]-px0[1] ]
 	}
 
+	getNormal(lon,lat){
+	    const [ px, py ] = getPixel(lon,lat);
+	    return [ px/this.width, py/this.height ]
+	}
+
 	getLonLat(px,py){
 	    let px0 = this.mercator.px( [ this.bounds.north, this.bounds.west ],this.zoom);
             return this.mercator.ll( [ px0[0]+px, px0[1]+py ],this.zoom );

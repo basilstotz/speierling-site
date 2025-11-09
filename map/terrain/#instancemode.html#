@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      header {
+        padding: 20px;
+      }
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+    
+    </style>
+    <meta charset="utf-8" />
+
+    <script src="p5/p5.min.js"></script>
+    <script src="bundle.js"></script>
+    <script>
+      //let RasterLayer;
+      //let Map3D;
+    </script>
+
+  </head>
+
+  <body>
+<div id="spinner" class="loader centered" style="display:none"></div>
+    <script>
+
+      p5.prototype.createGeometry = function(){
+	  return new p5.Geometry()
+      }
+
+      p5.prototype.createMap3D = function(p5){
+	  return Map3D.createMap3D(p5);
+      }
+
+      
+      function startSpinner(){
+	  console.log('start');
+	  document.getElementById('spinner').setAttribute('style','display:block;z-index:5')
+      }
+      
+      function stopSpinner(){
+	  console.log('stop');
+	  document.getElementById('spinner').setAttribute('style','display:none')
+      }
+
+
+      
+      let sketch = new p5( (p) =>{ 
+
+          p.updateMap = () => {
+	      p.map.setZoom(Number(p.zoom.value()));
+	      let s=Number(p.size.value());
+	      p.map.setSize(s,s);
+	      p.map.update();
+	  }
+	  
+	  p.setup = () => {
+	      
+	      p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+	      //debugMode();
+
+	      //controls
+	      p.button=p.createButton('update');
+	      p.button.position(240,20);
+	      p.button.mousePressed(p.updateMap)
+
+	      p.zoom=p.createSelect();
+	      p.zoom.position(20,20);
+	      p.zoom.option('12',12);
+	      p.zoom.option('13',13);
+	      p.zoom.option('14',14);
+	      p.zoom.option('15',15);
+	      p.zoom.option('16',16);
+	      p.zoom.selected('16');
+
+	      p.size=p.createSelect();
+	      p.size.position(120,20);
+	      p.size.option('256',256);
+	      p.size.option('512',512);
+	      p.size.option('768',768);
+	      p.size.option('1024',1024);
+	      //p.size.option('2048',2048);	  
+	      p.size.selected('512');
+
+	      p.sun=p.createSlider(0,Math.PI*2,0,0);
+	      p.sun.position(320,20);
+
+	      //map
+	      p.map = p.createMap3D(p);
+	      p.map.setMap(47.4926694, 7.6414257,12,512,512);
+	      //map.setMap(47.716129, 8.6102,12,512,512);
+	      p.map.setTerrainTemplate('../../data/maps/tiles/dem/{z}/{x}/{y}.png');
+	      p.map.setTextureTemplate('../../data/maps/tiles/esri/{z}/{x}/{y}.jpeg');
+
+	      p.map.on('updatestart',startSpinner);
+	      p.map.on('updateend',stopSpinner);
+
+	      p.updateMap();
+
+
+	 }
+
+	  p.draw = () => {
+	      p.background(255);
+	      p.orbitControl();
+	      if(p.map){
+		  let phi=p.sun.value();
+		  let lightX=Math.sin(phi)
+		  let lightY=-1*Math.sin(phi)
+		  let lightZ=Math.cos(phi)  
+		  p.map.setLight(lightX,-1,lightZ);
+		  p.map.render();
+	      }
+	  }
+      });
+      
+    </script>
+  </body>
+</html>

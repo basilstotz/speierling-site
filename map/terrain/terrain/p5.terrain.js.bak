@@ -1,0 +1,225 @@
+#!/usr/bin/env node
+
+//import Martini  from '../node_modules/@mapbox/martini/index.js'
+
+
+p5.prototype.terrainSurface = function(data,w,h,sx=1,sy=1,sz=1){
+    let geometry = new p5.Geometry();
+    let dx=w*sx/2;
+    let dy=w*sy/2;
+    for(let y=0;y<h;y++){
+	for(let x=0;x<w;x++){
+	    const vx = x                  * sx   -dx;
+	    const vy = y                  * sy   -dy; 
+	    const vz = data[y*breite+x]   * sz;
+	    const v = createVector(vx,vy,vz); 
+	    geometry.vertices.push(v);
+	    geometry.uvs.push(x/w);
+	    geometry.uvs.push(y/h);	    
+	    if(x>0 && y>0){
+		const idx=geometry.vertices.length-1;
+		geometry.faces.push( [ idx-w-1, idx-1, idx-w ]);
+		geometry.faces.push( [ idx-w  , idx-1, idx        ]);
+	    }
+	}
+    }
+    geometry.computeNormals(SMOOTH);
+    return geometry;    
+}
+
+p5.prototype.terrainBox = function(data,width,height,sx,sy,sz,options){
+
+    let d = 0;
+    if(!options.place)options.place='bottom';
+    switch(options.place){
+    case 'zero':
+	break;
+    case 'top':
+	d = -100000000;
+	for(let i=0;i<data.length;i++){if(data[i]>d)d=data[i];}
+	break;
+    case 'mean':
+	for(let i=0;i<data.length;i++)d+=data[i];
+	d/=data.length;
+	break;
+    case 'bottom':	
+    default:
+	d = 10000000;
+	for(let i=0;i<data.length;i++){if(data[i]<d)d=data[i];}
+	break;
+    }
+    if(options.offset)d+=options.offset;
+    d*=sz;
+    
+    let x,y;
+    let dx=width*sx/2;
+    let dy=height*sy/2;
+    noStroke();
+    beginGeometry();
+    //unten
+    fill(183,139,6);
+    beginShape(TRIANGLE_STRIP);
+    y=height-1;
+    for(x=0;x<width;x++){
+	vertex(x*sx-dx, y*sy-dy, data[(y*width+x)]*sz);
+	vertex(x*sx-dx, y*sy-dy, d);
+    }
+    endShape();
+    //oben
+    beginShape(TRIANGLE_STRIP);
+    y=0;
+    for(x=0;x<width;x++){
+	vertex(x*sx-dx, y*sy-dy, data[(y*width+x)]*sz);
+	vertex(x*sx-dx, y*sy-dy, d);
+    }
+    endShape();
+    fill(204,153,0);
+    //rechts
+    beginShape(TRIANGLE_STRIP);
+    x=width-1;
+    for(y=0;y<height;y++){
+	vertex(x*sx-dx, y*sy-dy, data[(y*width+x)]*sz);
+	vertex(x*sx-dx, y*sy-dy, d);
+    }
+    endShape();
+    //links
+    beginShape(TRIANGLE_STRIP);
+    x=0;
+    for(y=0;y<height;y++){
+	vertex(x*sx-dx, y*sy-dy, data[(y*width+x)]*sz);
+	vertex(x*sx-dx, y*sy-dy, d);
+    }
+    endShape();
+    //bottom
+    fill(155,117,3);
+    beginShape();
+    vertex(-dx,-dy,d);
+    vertex(-dx, (height-1)*sy-dy, d);
+    vertex((width-1)*sx-dx,(height-1)*sy-dy, d);
+    vertex((width-1)*sx-dx ,-dy, d);
+    endShape(CLOSE);
+    noFill();
+    return endGeometry().computeNormals(FLAT);
+}
+
+
+p5.prototype.TerrainData = class {
+    constructor(width,height){
+	if(width&&height){
+	    this.width=width;
+	    this.height=height;
+	    this.data=[];
+	    let l=width*height;
+	    for(let i=0;i<l;i++)this.data[i]=0;
+	}
+	this.mapper();
+    }
+
+    data(data,width,height){
+	this.width=width;
+	this.height=height;
+	this.data=data;
+    }
+
+    noise(level,scale){
+	let offset=random(1000);
+	for(let x=0;x<this.width;x++){
+	    for(let y=0;y<this.height;y++){
+		this.data[y*this.width+x]=level*noise((x+offset)*scale,(y+offset)*scale);
+	    }
+	}
+    }
+
+    mapper(xMin,xMax,yMin,yMax){
+	if(xMin&&xMax&&yMin&&yMax){
+	    this.xMin=xMin;
+	    this.xMax=xMax;
+	    this.yMin=yMin;
+	    this.yMax=yMax;
+	}else{
+	    this.xMin=0;
+	    this.xMax=this.width;
+	    this.yMin=0;
+	    this.yMax=this.height;
+	}
+    }
+	    
+    
+    forEach(callback){
+	for(let x=0;x<this.width;x++){
+	    for(let y=0;y<this.height;y++){
+		let nx=map(x,0,this.width,this.xMin,this.xMax);
+		let ny=map(y,0,this.height,this.yMin,this.yMax);
+		this.data[y*this.width+x]=callback(nx,ny);
+	    }
+	}
+    }
+	
+    
+    set(x,y,z){
+	this.data[y*this.width+x]=z;
+    }
+	
+}
+
+p5.prototype.Terrain = class {
+
+    constructor(options){
+	this.d=0;
+	this.sz=100;
+	this.width=512;
+	this.height=512;
+	this.boxOptions={ draw:false } 
+	if(options)this.options(options);
+    }
+
+    options(options){
+	if(options.width)this.width=options.width;
+	if(options.height)this.height=options.height;
+	if(options.sz)this.sz=options.sz;
+	if(options.d)this.d=options.d;
+	if(options.box){
+	    let opts=options.box;
+	    if(opts.draw)this.boxOptions.draw=opts.draw;
+	    if(opts.place)this.boxOptions.place=opts.place;
+	    if(opts.offset)this.boxOptions.offset=opts.offset;
+	}
+    }
+	
+    
+    update(dem,tex){
+	//this.dem = dem;
+	let sx = this.width/dem.width;
+	let sy = this.height/dem.height;
+	let data = dem.data;
+	let width = dem.width;
+	let height = dem.height;
+	let surface = terrainSurface(data,width,height,sx,sy,this.sz)
+	let box = terrainBox(data,width,height,sx,sy,this.sz,this.boxOptions)
+	
+	if(this.surface)freeGeometry(this.surface);
+	this.surface = surface;
+	if(this.box)freeGeometry(this.box);
+	this.box = box;
+    
+	if(tex)this.tex = tex;
+    }
+    
+    draw(){
+	//ambientMaterial(255);
+	
+	if(this.boxOptions.draw===true){
+	    //fill(255);
+	    if(this.box)model(this.box)
+	}
+	if(this.tex){
+	    texture(this.tex);
+	}else{
+	    //fill(0,225,0);
+	    noFill();
+	    stroke(0);
+	    //normalMaterial();
+	}
+	if(this.surface)model(this.surface)
+    }
+}

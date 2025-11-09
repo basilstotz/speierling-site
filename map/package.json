@@ -10,10 +10,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@mapbox/geo-viewport": "^0.5.0",
     "@mapbox/martini": "^0.2.0",
     "@mapbox/sphericalmercator": "^2.0.1",
     "@mapbox/tilebelt": "^2.0.2",
     "jimp": "^1.6.0",
-    "p5": "^1.11.3"
+    "p5": "^1.11.3",
+    "xyz-affair": "^0.9.1"
   }
 }

@@ -43,7 +43,9 @@
     <meta charset="utf-8" />
 
     <script src="p5/p5.min.js"></script>
-    <script src="bundle.js"></script>
+    <script src="terrain/p5.terrain.js"></script>
+    <script src="p5.map3d.js"></script>
+    <!--<script src="bundle.js"></script>-->
     <script>
       //let RasterLayer;
       //let Map3D;
@@ -78,7 +80,16 @@
 -->
 
     <script>
-  
+
+      p5.prototype.createGeometry = function(){
+          return new p5.Geometry()
+      }
+
+      /*
+      p5.prototype.createMap3D = function(p5){
+          return Map3D.createMap3D(p5);
+      }
+      */
       function startSpinner(){
 	  console.log('start');
 	  document.getElementById('spinner').setAttribute('style','display:block;z-index:5')
@@ -90,18 +101,35 @@
       }
 
       function updateMap(){
-	  map.setZoom(Number(zoom.value()));
+	  maps.setZoom(Number(zoom.value()));
+	  sz=Math.pow(2,Number(zoom.value)-16);
+	  console.log(sz);
 	  let s=Number(size.value());
-	  map.setSize(s,s);
-	  map.update();
+	  maps.setSize(s,s);
+	  if(ort.value=='schaffhausen'){
+	      maps.setPan(8.6102,47.716129)
+	  }else{
+	      maps.setPan(7.6414257, 47.4926694 )
+	  }
+	  maps.update();
       }
 
-      let map;
-      //let ready=false;
+      let geodata;
+      let maps;
+      
+      //controls
       let button;
       let zoom;
       let size;
       let sun;
+      let layer;    // osm / esri / none
+      let ort;
+      
+      let sz=2;
+
+      function preload(){
+	  geodata=loadJSON('sorbusdomestica.geojson');
+      }
 
       function setup() {
 
@@ -110,11 +138,11 @@
 
 	  //controls
 	  button=createButton('update');
-	  button.position(240,20);
+	  button.position(20,20);
 	  button.mousePressed(updateMap)
 
 	  zoom=createSelect();
-	  zoom.position(20,20);
+	  zoom.position(90,20);
 	  zoom.option('12',12);
 	  zoom.option('13',13);
 	  zoom.option('14',14);
@@ -123,7 +151,7 @@
 	  zoom.selected('16');
 
 	  size=createSelect();
-	  size.position(120,20);
+	  size.position(140,20);
 	  size.option('256',256);
 	  size.option('512',512);
 	  size.option('768',768);
@@ -132,17 +160,64 @@
 	  size.selected('512');
 
           sun=createSlider(0,Math.PI*2,0,0);
-	  sun.position(320,20);
+	  sun.position(205,20);
 
+          ort=createSelect();
+	  ort.position(350,20)
+	  ort.option('schaffhausen','schaffhausen');
+	  ort.option('baselland','baselland');
+	  ort.selected('baselland');
+	  
+	  layer=createSelect();
+	  layer.position(470,20);
+	  layer.option('osm');
+	  layer.option('esri');
+	  layer.option('fill');
+	  layer.option('wire');
+	  layer.selected('esri');
+	  
 	  //map
-	  map = Map3D.createMap3D(this);
-	  map.setMap(47.4926694, 7.6414257,12,512,512);
-	  //map.setMap(47.716129, 8.6102,12,512,512);
-	  map.setTerrainTemplate('../../data/maps/tiles/dem/{z}/{x}/{y}.png');
-	  map.setTextureTemplate('../../data/maps/tiles/esri/{z}/{x}/{y}.jpeg');
+	  maps = createMap3D(this);
+	  maps.setMap(47.4926694, 7.6414257,12,512,512);
+	  //maps.setMap(47.716129, 8.6102,12,512,512);
+	  maps.setTerrainTemplate('../../data/maps/tiles/dem/{z}/{x}/{y}.png');
+	  maps.setTextureTemplate('../../data/maps/tiles/esri/{z}/{x}/{y}.jpeg');
 
-	  map.events.on('updatestart',startSpinner);
-	  map.events.on('updateend',stopSpinner);
+
+	  function pointToLayer(feature,zoom){
+	      let tags=feature.properties.tags;
+	      let propagation=tags.propagation;
+	      let col;
+	      switch(propagation){
+	      case 'natural':
+		  col= this.pInst.color(0,255,0);
+		  break;
+	      case 'planted':
+		  col= this.pInst.color(0,0,255);
+		  break;
+	      case 'seed':
+		  col= this.pInst.color(255,0,0)
+		  break;
+	      case 'graft':
+		  col= this.pInst.color(255,255,0);
+		  break;
+	      default:
+		  col=this.pInst.color(255);
+	      }
+	      //this.pInst.noStroke();
+	      this.pInst.emissiveMaterial(col);
+	      //this.pInst.fill(col);
+	      this.pInst.sphere(Math.pow(1.85,zoom-12));
+	      this.pInst.strokeWeight(3);
+	      this.pInst.stroke(255);
+	      this.pInst.line(0,10,0,10,0,0)
+	  }
+
+	  maps.vectorLayer.pointToLayer=pointToLayer;
+	  maps.vectorLayer.set(geodata);
+	  
+	  maps.on('updatestart',startSpinner);
+	  maps.on('updateend',stopSpinner);
 	  
 	  updateMap();
 	  
@@ -152,13 +227,14 @@
       function draw() {
 	  background(255);
 	  orbitControl();
-	  if(map){
+	  if(maps){
+	      //scale(16,1,16);
 	      let phi=sun.value();
 	      let lightX=Math.sin(phi)
               let lightY=-1*Math.sin(phi)
               let lightZ=Math.cos(phi)  
-	      map.setLight(lightX,-1,lightZ);
-	      map.render();
+	      maps.setLight(lightX,-1,lightZ);
+	      maps.render();
 	  }
       }
 

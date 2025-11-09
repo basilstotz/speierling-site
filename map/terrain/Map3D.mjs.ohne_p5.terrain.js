@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 
-//import { HeightGrid } from './HeightGrid.mjs';
+import { HeightGrid } from './HeightGrid.mjs';
 import * as tilebelt from '../node_modules/@mapbox/tilebelt/dist/esm/index.js';
 import  { SphericalMercator } from '../node_modules/@mapbox/sphericalmercator/dist/esm/index.js';
 import * as utils from '../../../data/data-factory/modules/map-utils.mjs'
-//import Martini  from '../node_modules/@mapbox/martini/index.js'
-
-//import {tilebelt,SpericalMercator,utils} from './mapBundle.js'
-
-//import * as uhu from './mapBundle.js'
+import Martini  from '../node_modules/@mapbox/martini/index.js'
 
 
 class Emitter {
@@ -45,22 +41,18 @@ class Map3D {
     constructor(){
 	this.mercartor = new SphericalMercator({size: 256,antimeridian: true});
 	this.setMap(47.5,7.5,16,512,512);
-	//this.frame=false;
+	this.frame=false;
 	//this.pInst=p5;
     }           
 
     init(){
 	this.terrainLayer = new RasterLayer(this.pInst);
 	this.textureLayer =  new RasterLayer(this.pInst);
-	this.vectorLayer = new GeoJSONLayer(this.pInst);
 	this.events = new Emitter();
-	let options={ width: 512, height:512, box: { draw: true, align: 'bottom', offset: 0}, sz:2 }
-	this.terrain = new Terrain(options);
 	
-	//this.frameBuffer = this.pInst.createFramebuffer();
+	this.frameBuffer = this.pInst.createFramebuffer();
     }
 
-    ///////////////////////////////setter/////////////////////////////////////////
     
     setMap( lat,lon,zoom,width,height){
 	this.lon=lon;
@@ -93,44 +85,22 @@ class Map3D {
 	this.textureLayer.cache={};
     }
 
-    setGeoJSON(geo){
-	this.vectorLayer.set(geo);
-    }
-
-    ///////////////////////////getter//////////////////////////////777
-    
     getPixel(lon,lat){
-	let px0 = this.mercartor.px( [ this.bounds.west, this.bounds.north ],this.zoom);
-	let px1 = this.mercartor.px( [ lon,lat],this.zoom);
-	let dx=px1[0]-px0[0];
-	let dy=px1[1]-px0[1];
-	return [ dx,  dy  ]
+	let px0 = this.mercator.px( [ this.bounds.north, this.bounds.west ],this.zoom);
+	let px1 = this.mercator.px( [ lon,lat],this.zoom);
+	return [ px1[0]-px0[0], px1[1]-px0[1] ]
     }
 
     getNormal(lon,lat){
-	const [ px, py ] = this.getPixel(lon,lat);
+	const [ px, py ] = getPixel(lon,lat);
 	return [ px/this.width, py/this.height ]
     }
-
-    getElevation(lon,lat){
-	let [nx,ny] = this.getNormal(lon,lat);
-	return this.terrainData.getNormalized(nx,ny);
-    }
-
-    sit(lon,lat){
-	let [ px,py ] = this.getPixel(lon,lat);
-	let pz = this.getElevation(lon,lat);
-	this.pInst.translate( px,py,pz*Math.pow(2,this.zoom-15) );
-    }	
-    
     
     getLonLat(px,py){
 	let px0 = this.mercator.px( [ this.bounds.north, this.bounds.west ],this.zoom);
 	return this.mercator.ll( [ px0[0]+px, px0[1]+py ],this.zoom );
     }
-   
 
-    /////////////////////////////////////////update////////////////////////////////////////7
     on(event, callback){
 	this.events.on(event, callback);
     }
@@ -143,127 +113,178 @@ class Map3D {
 	this.events.emit('updatestart','');
 	setTimeout(async () => { await this.updateAsync() },500); 
     }
-
+    
     async updateAsync(){
+
 	let terrain;
-	let tex;
-	let geo;
-	
+	let box;
 	this.bounds=utils.latLngToBounds(this.lat,this.lon,this.zoom,this.width,this.height);
-	//prepare dem
 	if(this.terrainLayer){
-	    terrain = new TerrainData();
+	    //console.log(this.lat,this.lon,this.zoom,this.width,this.height);
 	    let demImage = await this.terrainLayer.getImage(this.bounds,12,true);
-	    terrain.setRaster(demImage);
-	    this.terrainData= terrain;
+	    //make grid
+	    demImage.loadPixels();
+	    let pixels = demImage.pixels;
+	    let grid = new HeightGrid(pixels,demImage.width,demImage.height);
+            //calc factors
+	    let fac=32/grid.width;
+	    let sx=this.width/grid.width;
+	    let sy=this.height/grid.height;
+	    let sz=2*fac;	    
+	    let d=sz*(grid.getMin()-10);
+	    this.dTemp=d;
+	    //makeModels
+	    box = this.makeBox(grid,sx,sy,sz,d);	    
+	    terrain = this.makeTerrain(grid,sx,sy,sz,d);
 	}
-	//prepare tex
-	if(this.textureLayer){
-	    tex = await this.textureLayer.getImage(this.bounds,this.zoom);
+
+	/*
+	if(this.textureLayer&&false){
+	    if(this.tex)delete this.tex;
+	    this.tex = await this.textureLayer.getImage(this.bounds,this.zoom);
 	}
-	//prepare geojson
-	if(this.vectorLayer){
-	    this.pInst.beginGeometry();
-	    this.vectorLayer.forEach( (feature) => {
-	         let coords=feature.geometry.coordinates;
-		 if(utils.isInBbox(coords[0],coords[1],this.bounds)){
-		     this.pInst.push();
-		     this.sit(coords[0],coords[1]); /////???????????????
-		     this.vectorLayer.pointToLayer(feature,this.zoom);
-		     this.pInst.pop()
-		 }
-	    })
-	    geo = this.pInst.endGeometry();
+        */
+    
+	if(this.textureLayer && false){
+	    let tex = await this.textureLayer.getImage(this.bounds,this.zoom);
+	    if(this.frame){
+		if(this.frameBuffer && tex){
+		    this.frameBuffer.resize(tex.width,tex.height);
+		    this.frameBuffer.begin();
+		    image(tex,0,0);
+		    this.frameBuffer.end();
+		}
+	    }else{
+		this.tex=tex;
+	    }
 	}
-	    
-	//update
-	this.terrain.options( { width: this.width, height: this.height } );
-        this.terrain.update(terrain,tex);
-	this.geo = geo;
+	if(terrain){
+	    if(this.terrain)this.pInst.freeGeometry(this.terrain);
+	    this.terrain = terrain;	    
+	    if(this.box)this.pInst.freeGeometry(this.box);
+	    this.box= box;
+
+	}
+	this.moveX=this.width/2;
+	this.moveY=this.height/2
+	this.moveZ=this.dTemp;
+
 	this.events.emit('updateend','');    
     }
-
-    /////////////////////////////////////////////////////////////////////////////////////////
     
     setLight(x,y,z){
 	this.lightX=x;
 	this.lightY=y;
 	this.lightZ=z;
     }
-    
+
     render(){
-	//this.pInst.debugMode();
+	//this.pInst.translate(-1*this.breite/2,-2*this.min,-1*this.hoehe/2);
+	//this.pInst.translate(-1*this.breite/2,this.hoehe,1*this.min);
+	//this.pInst.rotateX(this.pInst.PI/2)
+	this.pInst.push();
+
 	this.pInst.rotateX(this.pInst.PI/2)
-        this.pInst.ambientLight(64);
+
+        this.pInst.ambientLight(32);                                                                                         //this.pInst.directionalLight(255, 255, 255, -1, -1,1);
         this.pInst.directionalLight(255, 255, 255, this.lightX,this.lightY,this.lightZ);
-        this.terrain.align();
-	if(this.geo)this.pInst.model(this.geo);
-        this.terrain.draw();
-    }    
-}
 
+	this.pInst.translate(-this.moveX,-this.moveY,-this.moveZ);
 
-class GeoJSONLayer {
-    constructor(pInst){
-	this.pInst=pInst
-	this.pointTolayer = this.defaultPointToLayer;
-    }
-
-    
-
-    set(geojson){
-	this.geojson=geojson
-	//this.model = this.makeModel();
-    }
-
-    setPointToLayer(callback){
-	this.pointToLayer=callback;
-    }
-    
-    defaultPointToLayer(feature){
-	this.pInst.fill(0,255,0);
-	this.pInst.sphere(10);
-    }
-    
-
-    pointToLayer(feature){
-	let tags=feature.properties.tags;
-	let propagation=tags.propagation;
-	let col;
-	switch(propagation){
-	case 'natural':
-	    col= this.pInst.color(0,255,0);
-	    break;
-	case 'planted':
-	    col= this.pInst.color(0,0,255);
-	    break;
-	case 'seed':
-	    col= this.pInst.color(255,0,0)
-	    break;
-	case 'graft':
-	    col= this.pInst.color(255,255,0);
-	    break;
-	default:
-	    col=this.pInst.color(255);
+	this.pInst.fill(0,225,0);
+	if(this.frame){
+	    //if(this.tex)this.pInst.texture(this.tex)
+	    if(htis.frameBuffer)this.pInst.texture(this.frameBuffer);
+	}else{
+	    if(this.tex)this.pInst.texture(this.tex);
 	}
+	if(this.terrain)this.pInst.model(this.terrain)
 	this.pInst.noStroke();
-	//this.pInst.emissiveMaterial(col);
-	this.pInst.fill(col);
-	this.pInst.sphere(10);
-	this.pInst.strokeWeight(3);
-	this.pInst.stroke(255);
-	this.pInst.line(0,10,0,10,0,0)
+	if(this.box)this.pInst.model(this.box);          
+
+	this.pInst.pop();
     }
 
-    forEach(callback){
-	let features=this.geojson.features;
-	//this.pInst.beginGeometry();
-	for(let i=0;i<features.length;i++){
-	    let feature=features[i];
-	    callback(feature);
+    
+    makeTerrain(grid,sx,sy,sz,d){
+	let geometry = this.pInst.createGeometry();
+	let w=grid.width
+	let h=grid.height
+	for(let y=0;y<h;y++){
+	    for(let x=0;x<w;x++){
+		const vx = x                  * sx;
+		const vy = y                  * sy;
+		const vz = grid.get(x,y)      * sz;
+		const v = this.pInst.createVector(vx,vy,vz); 
+		geometry.vertices.push(v);
+		geometry.uvs.push(x/w);
+		geometry.uvs.push(y/h);
+		if(x>0 && y>0){
+		    const idx=geometry.vertices.length-1;
+		    geometry.faces.push( [ idx-w-1, idx-1, idx-w ]);
+		    geometry.faces.push( [ idx-w  , idx-1, idx        ]);
+		}
+	    }
 	}
+	geometry.computeNormals(this.pInst.SMOOTH);
+	return geometry;
     }
+  
 
+     makeBox(grid,sx,sy,sz,d){
+	 //texture(texte);
+	 let x,y;
+	 this.pInst.noStroke();
+	 this.pInst.beginGeometry();
+
+	 this.pInst.fill(183,139,6);
+	 //unten
+	 this.pInst.beginShape(this.pInst.TRIANGLE_STRIP);
+	 y=grid.height-1;
+	 for(x=0;x<grid.width;x++){
+	     this.pInst.vertex(x*sx, y*sy, grid.get(x,y)*sz);
+	     this.pInst.vertex(x*sx, y*sy, d);
+	 }
+	 this.pInst.endShape();
+	 //oben
+	 this.pInst.beginShape(this.pInst.TRIANGLE_STRIP);
+	 y=0;
+	 for(x=0;x<grid.width;x++){
+	     this.pInst.vertex(x*sx, y*sy, grid.get(x,y)*sz);
+	     this.pInst.vertex(x*sx, y*sy, d);
+	 }
+	 this.pInst.endShape();
+	 this.pInst.fill(204,153,0);
+	 //rechts
+	 this.pInst.beginShape(this.pInst.TRIANGLE_STRIP);
+	 x=grid.width-1;
+	 for(y=0;y<grid.height;y++){
+	     this.pInst.vertex(x*sx, y*sy, grid.get(x,y)*sz);
+	     this.pInst.vertex(x*sx, y*sy, d);
+	 }
+	 this.pInst.endShape();
+
+	 //links
+	 this.pInst.beginShape(this.pInst.TRIANGLE_STRIP);
+	 x=0;
+	 for(y=0;y<grid.height;y++){
+	     this.pInst.vertex(x*this.pInst.sx, y*sy, grid.get(x,y)*sz);
+	     this.pInst.vertex(x*sx, y*sy, d);
+	 }
+	 this.pInst.endShape();
+
+	 //bottom
+	 this.pInst.fill(155,117,3);
+	 this.pInst.beginShape();
+	 this.pInst.vertex(0,0,d);
+	 this.pInst.vertex(0, (grid.height-1)*sy, d);
+	 this.pInst.vertex((grid.width-1)*sx,(grid.height-1)*sy, d);
+	 this.pInst.vertex((grid.width-1)*sx ,0, d);
+	 this.pInst.endShape(this.pInst.CLOSE);
+	 this.pInst.noFill();
+
+	 return this.pInst.endGeometry().computeNormals();
+     }
 }
 
 
@@ -275,6 +296,7 @@ class RasterLayer{
 	this.cache={};
 	this.pInst=pInst
     }
+
 
     setTemplate(template){
 	if(template){
@@ -289,6 +311,7 @@ class RasterLayer{
 	    this.pInst.loadImage(path,resolve,reject)
 	})
     }
+
 
     async getTileFromURL(quadkey){
 	let [x,y,z] = tilebelt.quadkeyToTile(quadkey);
@@ -361,18 +384,33 @@ class RasterLayer{
 }
 
 
+class GeoJSONLayer {
+    constructor(pInst){
+	this.pInst=pInst
+    }
 
+
+    setGeoJSON(geojson){
+	this.geojson=geojson
+    }
+
+    pointToLayer(feature){
+	
+
+    }
+
+}
 
 //https://www.youtube.com/watch?v=-c9RLgmdVXQ
 
-p5.prototype.createMap3D =  function(pInst){
+export function createMap3D(pInst){
     const pMap3D = new Map3D();
     pMap3D.pInst = pInst;
     pMap3D.init();    
     return pMap3D;
 }
 
-p5.prototype.createRsterLayer =function(p5inst){
+export function createRasterLayer(p5inst){
     const pRasterLayer = new RasterLayer();
     pRasterLayer.pInst=p5inst;
     return pRasterLayer;
