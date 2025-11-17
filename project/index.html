@@ -37,7 +37,7 @@
      
   <script>
 
-let text=`<div style="background:#eeeeee;color:black;padding:40px">
+let text1=`<div style="background:#eeeeee;color:black;padding:40px">
 
 <h3>Speierling</h3>
 
@@ -83,9 +83,25 @@ let text=`<div style="background:#eeeeee;color:black;padding:40px">
 <p>Basel, im Dezember 2025</p>
 </div>
 `;
+
+
+text2=`
+<div style="background:#eeeeee;color:black;padding:50px">
+<!---<div style="margin-left:auto;margin-right:auto">--->
+<h3>Vermehrung</h3>
+<p>Dieses Video zeigt die Vermehrung von Speierlingen (mittels Samen) in einem Wald in Mainfranken (Bayern)</p> 
+<div>
+<iframe  width="560" height="315" src="https://www.youtube.com/embed/NjZD66KZQg0?si=B7SKJqg7afMSEWM6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+<h3>Nutzung</h3>
+<p>Und dieses Video zeigt einige Möglichkeiten der Nutzung von Speierlingsfrüchten (in Luxenburg)</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Hwlw9Y2PeNA?si=16dk4uW6QFUIv6UD" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+</div>
+`;
     
     let tabulator;
-    let container;
+    let container1,container2;
     
      function onBody(){
 	 toHome();
@@ -93,10 +109,17 @@ let text=`<div style="background:#eeeeee;color:black;padding:40px">
 	 let parent = document.getElementById('inhalt');
          tabulator= new Tabulator(parent);
 
-	 container = document.createElement('div');
-	 container.innerHTML=text;
+	 container1 = document.createElement('div');
+	 container1.innerHTML=text1;
+	 tabulator.addTab(container1,"Angaben zum Projekt");
 
-	 tabulator.addTab(container,"Angaben zum Projekt")
+	 container2 = document.createElement('div');
+	 container2.innerHTML=text2;
+	 tabulator.addTab(container2,"Videos");
+
+
+
+	 
          tabulator.openFirstTab();
 	 
 	 
