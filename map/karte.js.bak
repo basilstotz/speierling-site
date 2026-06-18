@@ -106,9 +106,6 @@ function getSlopeGeojson(geojson){
 }
 
 
-
-
-
 ///////////////////////////////////////marker////////////////////////////////////////
 
 let markerList = {};
@@ -313,38 +310,9 @@ if(offline==true){
     // http://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png
     osmLayer = L.tileLayer.colorFilter('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
-        referrerPolicy: 'strict-origin-when-cross-origin',
         filter: osmFilter
    }).addTo(map);
 }
-
-/*
-let gbifFilter = [
-    'blur:0px',
-    'brightness:100%',
-    'contrast:100%',
-    'grayscale:100%',
-    'hue:0deg',
-    'opacity:70%',
-    'invert:0%',
-    'saturate:100%',
-    'sepia:0%'
-];
-*/
-
- /////////////////////////
-let gbifFilter=['opacity:0.8'];
-
-//gbifURL=
-
-// https://techdocs.gbif.org/en/openapi/v2/maps
-//taxon_key=3013215
-
-    gbifLayer = L.tileLayer.colorFilter( 'https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG:3857&taxonKey=3013215&bin=hex&hexPerTile=57&style=classic-noborder.poly', {                        
-        attribution: '<a href="https://gbif.org">GBIF</a>',                
-        referrerPolicy: 'strict-origin-when-cross-origin',                                                            
-        filter: gbifFilter                                                                                             
-   }).addTo(map);
 
 
 // 
@@ -502,31 +470,13 @@ let relative=false;
     let aspectLayer=false;
 //let filteredTreeLayer=false;
 
-
-let polygonFC;
-let polygonFC2;
-let indexedPolygon;
-
 function addGeojsonLayer(responseText){
 
     let geo=JSON.parse(responseText)
     // rapairTags and addParentIndex goes here
 
     let globalGeo=geo;
-
-        /////////////////// nachbar ///////////////////////////
-    let nachbar = new Nachbar(geo);
-    let uhu=3
-    polygonFC = nachbar.getPolygon(uhu,uhu,2*uhu);
-
-    indexPolygon={}
-    polygonFC.features.forEach( (feature) => { indexPolygon[feature.properties.clusterID]=feature })
     
-    //polygonFC = nachbar.getPolygon(5,2,3);
-
-
-
-    /////////////////////nachbar/////////////////////////////
     search=[]
     //let searchStrings=[];
     let features=geo.features;
@@ -567,10 +517,6 @@ function addGeojsonLayer(responseText){
         pointToLayer: pointToLayer
     });
 
-    let clusterLayer=L.geoJSON(polygonFC, {style: function(feature){
-	return {weight:2,opacity:0.3,color:"blue",fillOpacity:0.05,fillColor:"blue"}}
-					  });
-
  
     
 
@@ -597,7 +543,6 @@ function addGeojsonLayer(responseText){
     
     aspectLayer.addTo(map);
     relative.addTo(map);
-    clusterLayer.addTo(map);
     treeLayer.addTo(map);
     stopSpinner();
 
@@ -624,7 +569,7 @@ function addGeojsonDistri(responseText){
     let geojsonLayer=JSON.parse(responseText);
 
     distri=L.geoJSON(geojsonLayer, {
-        style: function(feature){return { opacity:0.0,fillOpacity:0.05,color:"#004400" }}
+        style: function(feature){return { opacity:0.0,fillOpacity:0.09,color:"#004400" }}
         //filter: filter,
         //onEachFeature: onEachFeature,
         //pointToLayer: pointToLayer
@@ -647,59 +592,22 @@ function addGeojsonCliff(responseText){
 
     cliff.addTo(map);
 }
-
 */
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
-
-var heatLayer;
-
-function addGBIF(responseText){
-
-    let geojsonLayer=JSON.parse(responseText);
-
-    /* geojsonlayer
-    let gbif=L.geoJSON(geojsonLayer, {
-        //style: function(feature){return { opacity:0.5,fillOpacity:0.5,color:"#00ff00" }}
-        //filter: filter,
-        //onEachFeature: onEachFeature,
-        //pointToLayer: pointToLayer
-    });
-    gbif.addTo(map);
-    */
-
-    let data=[];
-    let features=geojsonLayer.features
-    for(let i=0;i<features.length;i++){
-       let item=features[i];
-       let lon=item.geometry.coordinates[0];
-       let lat=item.geometry.coordinates[1];
-       let ausgabe = [ lat, lon, 0.07 ];
-       data.push(ausgabe);
-    }
-    heatLayer = L.heatLayer(data,{ maxZoom:11,"radius":50,"gradient.off":{0.4:'blue',0.65:'green',1: 'red'} })   //.addTo(map);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-let rectLayer=false;
+let rect=false;
 
 function addGeojsonRect(responseText){
 
     let geojsonLayer=JSON.parse(responseText);
 
-    rectLayer=L.geoJSON(geojsonLayer, {
+    rect=L.geoJSON(geojsonLayer, {
         style: function(feature){return { fill:true,opacity:1.0,fillOpacity:0.05,color:"#111111",weight:0 }}
         //filter: filter,
         //onEachFeature: onEachFeature,
         //pointToLayer: pointToLayer
     });
 
-    //rectLayer..addTo(map);
+    rect.addTo(map);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -721,15 +629,11 @@ function httpGet(theUrl, callback){
 // load and add layers
 //httpGet('cliff+045+005.geojson', addGeojsonCliff);
 
-//neu
-
 httpGet('Rect.geojson', addGeojsonRect);
 
 httpGet('Sorbus_domestica_plg.geojson', addGeojsonDistri);
 
 //httpGet('../data/slope.geojson', addSlopeLayer);
-
-httpGet('occurrence.geojson', addGBIF);
 
 
 httpGet(dataDir+'sorbusdomestica.geojson', addGeojsonLayer);
@@ -743,16 +647,6 @@ let grayscale;
 adaptZoom();
 
 
-
-function displayLayer(layer,on){
-   if(layer){
-      if(on){
-         if(!map.hasLayer(layer))map.addLayer(layer);  
-      }else{
-         if(map.hasLayer(layer))map.removeLayer(layer);  
-      }
-   }
-}
 
 function  adaptZoom(){
     
@@ -800,18 +694,17 @@ function  adaptZoom(){
     */
     
     //project rectangle
-    if(rectLayer){
+    if(rect){
 	let fillOpacity=0.3-(zoom-3.0)*0.15;
 	if(fillOpacity>0.2)fillOpacity=0.3;
 	if(fillOpacity<0.0)fillOpacity=0.0;  
-	rectLayer.setStyle(function(feature){return { fill:true,opacity:1.0,fillOpacity:fillOpacity,color:"#111111",weight:0 }});
+	rect.setStyle(function(feature){return { fill:true,opacity:1.0,fillOpacity:fillOpacity,color:"#111111",weight:0 }});
     }
     //tree distribution
     if(distri){
 	fillOpacity=0.3-(zoom-5.0)*0.05;
-	if(fillOpacity>0.2)fillOpacity=0.2;
-	if(fillOpacity<0.0)fillOpacity=0.0;
-        //fillOpacity=0.15;  
+	if(fillOpacity>0.2)fillOpacity=0.3;
+	if(fillOpacity<0.0)fillOpacity=0.0;  
 	distri.setStyle(function(feature){return { opacity:0.0,fillOpacity:fillOpacity,color:"#004400" }})
     }
 
@@ -828,26 +721,6 @@ function  adaptZoom(){
     if(scale>1.0)scale=1.0;
     if(scale<0.2)scale=0.2;
     scaleMarkerRadius(scale);
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
-    let uhu=(zoom<6);
-    //displayLayer(treeLayer,!uhu);
-    //displayLayer(relative,!uhu);
-    //diaplayLayer(aspectLayer,!uhu); 
-
-/*
-    if(zoom<6 || zoom>9 ){	
-        if(map.hasLayer(heatLayer))map.removeLayer(heatLayer);
-   }else{   
-	if(!map.hasLayer(heatLayer))map.addLayer(heatLayer);
-     }
-*/
-
-////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
 
     /*
     if(zoom>13){

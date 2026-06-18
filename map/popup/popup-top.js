@@ -1,6 +1,18 @@
 
 // https://gis.stackexchange.com/questions/330608/leaflet-marker-popup-link-from-outside-of-map-dynamically
 
+function environ(env,dist){
+    let count=0;
+    let area=dist*dist*3.14159;
+    let density=count/area;
+    for (const [key, value] of Object.entries(env.nachbarn)) {
+	if(value<dist)count++
+    }
+    return { count: count, density: density }
+}
+
+
+
 ///////////////////////////////////////popup////////////////////////////////////////
 
 function portrait(parentElm,feature, diffs){
@@ -8,7 +20,10 @@ function portrait(parentElm,feature, diffs){
     
     const tags = feature.properties.tags;
     const id = feature.properties.id;
-    
+
+    let env;
+
+    if(feature.env)env=feature.env;
 
     //const portraitDiv = document.getElementById("portrait"+id);
     const portraitDiv=parentElm;
@@ -210,6 +225,55 @@ function portrait(parentElm,feature, diffs){
 	appendTableRow(tabelle, "Früchte:", tags["speierlingproject:Fruechte"])
     }
 
+    /*
+      "env": {
+        "nachbarn": {},
+        "nachbarCount": 0,
+        "nachbarDichte": 0,
+        "clusterID": 0
+      }
+    */
+
+    
+    if(env){
+	let dist=polygonFC.dist;
+	if(env.nachbarn){
+
+	    appendTableRow(tabelle, "Nachbardistanz:", "&nbsp;&le;&nbsp;&nbsp;"+dist+" km");
+	    
+	    let count=0;
+	    for (const [key, value] of Object.entries(env.nachbarn)) {
+		if(value<dist)count++
+	    }
+	    let area= dist*dist*3.114156;
+	    let density=Math.round(1000*count/area)/1000;
+
+	    appendTableRow(tabelle, "lokale Nachbarn:", count);
+	    appendTableRow(tabelle, "lokale Dichte:", density + " km<sup>-2</sup>");
+	}
+
+	if(env.clusterID){
+	    let cluster;
+	    /*
+	    polygonFC.features.forEach( (feature) => {
+		if(feature.properties.clusterID==env.clusterID)cluster=polygonFC.features[env.clusterID];
+	    });
+            */
+	    //cluster=polygonFC.features[env.clusterID];
+	    cluster=indexPolygon[env.clusterID];
+	    if(cluster){
+		let memberCount=cluster.properties.memberCount;
+		let area=cluster.properties.area;
+		let density=cluster.properties.density;
+		appendTableRow(tabelle, "Vernetzungsbäume:", memberCount);
+		appendTableRow(tabelle, "Vernetzungsfläche:", Math.round(10*area)/10+" km<sup>2</sup>");
+		appendTableRow(tabelle, "Vernetzungsdichte:", Math.round(1000*density)/1000+" km<sup>-2</sup>");
+		//appendTableRow(tabelle, "ClusterID:", env.clusterID);
+		
+	    }
+	}
+
+    }
 
     
 }

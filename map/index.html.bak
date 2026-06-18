@@ -48,17 +48,6 @@
     <!--- leaflet-gps -->
    <script src="leaflet-gps/leaflet-gps.min.js"></script>
    <link rel="stylesheet" href="leaflet-gps/leaflet-gps.min.css"/>
-
-    <!--- leaflet-heat -->
-   <script src="Leaflet.heat/dist/leaflet-heat.js "></script>
-<script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
-   <!--<script src="./nachbar/turf.min.js" charset="utf-8"></script>-->
-<style>
-.leaflet-heatmap-layer {
-opacity: .4;
-}
-</style>
-
    
    <!--- popup.js --->
    <script src="popup/popup-functions.js"></script>
@@ -110,10 +99,6 @@ opacity: .4;
       if(fileName=='')fileName='index.html';
       var devMode=(fileName!='index.html')
    </script>
-
-<!--   <script src="./nachbar/nachbar-funcs.js"></script> -->   
-   <script src="./nachbar/nachbar-funcs.js"></script>
-
 
 </head>
 
